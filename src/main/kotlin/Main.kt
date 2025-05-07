@@ -1,109 +1,121 @@
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.drawText
-import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
+import androidx.compose.ui.graphics.graphicsLayer
+import domain.model.ArchitectureLayer
 import domain.model.TestData
+import ui.components.canvas.NodeBox
 
 @Composable
-@Preview
 fun App() {
-    val architecture = remember { TestData.createBookLibraryArchitecture() }
-    val textMeasurer = rememberTextMeasurer()
-    
+    val architecture = TestData.createBookLibraryArchitecture()
+    val nodesByLayer = ArchitectureLayer.values().map { layer ->
+        layer to architecture.getNodesByType(layer).toList()
+    }
+
+    // Layout constants
+    val layerSpacing = 160f
+    val nodeSpacing = 200f // More space for wider boxes
+    val startX = 100f
+    val startY = 80f
+    val nodeBoxWidth = 180f
+    val nodeBoxHeight = 80f
+
+    // Calculate node positions (auto-layout)
+    val nodePositions = mutableMapOf<String, Offset>()
+    nodesByLayer.forEachIndexed { layerIndex, (layer, nodes) ->
+        val y = startY + layerIndex * layerSpacing
+        val totalWidth = (nodes.size - 1) * nodeSpacing
+        val layerStartX = startX + if (nodes.size > 1) 0f else totalWidth / 2
+        nodes.forEachIndexed { nodeIndex, node ->
+            val x = layerStartX + nodeIndex * nodeSpacing
+            nodePositions[node.id] = Offset(x, y)
+        }
+    }
+
+    var selectedNodeId by remember { mutableStateOf<String?>(null) }
+
+    // Find related nodes for highlighting
+    val selectedNode = selectedNodeId?.let { architecture.getNodeById(it) }
+    val dependencyIds = selectedNode?.dependencies?.map { it.targetId }?.toSet() ?: emptySet()
+    val dependentIds = architecture.getAllNodes().filter { n ->
+        n.dependencies.any { it.targetId == selectedNodeId }
+    }.map { it.id }.toSet()
+    val highlightIds = (dependencyIds + dependentIds + setOfNotNull(selectedNodeId))
+
     MaterialTheme {
-        Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF1A1B26))
+                .padding(24.dp)
+                .clickable { selectedNodeId = null } // Reset selection on background click
+        ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-                // Draw dependencies (arrows) first
-                architecture.getAllNodes().forEach { node ->
-                    node.dependencies.forEach { dep ->
-                        val targetNode = architecture.getNodeById(dep.targetId)
-                        targetNode?.let {
-                            // Draw arrow from source to target
-                            val start = node.position
-                            val end = it.position
-                            
-                            // Calculate arrow path
-                            val path = Path().apply {
-                                moveTo(start.x, start.y)
-                                lineTo(end.x, end.y)
-                            }
-                            
-                            // Draw line
-                            drawPath(
-                                path = path,
-                                color = Color.Gray,
-                                style = Stroke(width = 2f)
-                            )
-                            
-                            // Draw arrow head
-                            val angle = Math.atan2((end.y - start.y).toDouble(), (end.x - start.x).toDouble())
-                            val arrowLength = 10f
-                            val arrowAngle = Math.PI / 6 // 30 degrees
-                            
-                            val arrowPath = Path().apply {
-                                moveTo(end.x, end.y)
-                                lineTo(
-                                    end.x - arrowLength * Math.cos(angle - arrowAngle).toFloat(),
-                                    end.y - arrowLength * Math.sin(angle - arrowAngle).toFloat()
-                                )
-                                lineTo(
-                                    end.x - arrowLength * Math.cos(angle + arrowAngle).toFloat(),
-                                    end.y - arrowLength * Math.sin(angle + arrowAngle).toFloat()
-                                )
-                                close()
-                            }
-                            
-                            drawPath(
-                                path = arrowPath,
-                                color = Color.Gray
+                // Only show connections if a node is selected
+                if (selectedNode != null) {
+                    // Draw dependency lines/arrows from selected node
+                    selectedNode.dependencies.forEach { dep ->
+                        val from = nodePositions[selectedNode.id] ?: return@forEach
+                        val to = nodePositions[dep.targetId] ?: return@forEach
+                        drawLine(
+                            color = Color(0xFFB83B5E),
+                            start = Offset(from.x + nodeBoxWidth / 2, from.y + nodeBoxHeight / 2),
+                            end = Offset(to.x + nodeBoxWidth / 2, to.y + nodeBoxHeight / 2),
+                            strokeWidth = 3f
+                        )
+                    }
+                    // Draw lines from dependents to selected node
+                    architecture.getAllNodes().forEach { node ->
+                        if (node.dependencies.any { it.targetId == selectedNode.id }) {
+                            val from = nodePositions[node.id] ?: return@forEach
+                            val to = nodePositions[selectedNode.id] ?: return@forEach
+                            drawLine(
+                                color = Color(0xFFB83B5E),
+                                start = Offset(from.x + nodeBoxWidth / 2, from.y + nodeBoxHeight / 2),
+                                end = Offset(to.x + nodeBoxWidth / 2, to.y + nodeBoxHeight / 2),
+                                strokeWidth = 3f
                             )
                         }
                     }
                 }
-                
-                // Draw nodes (boxes) on top
-                architecture.getAllNodes().forEach { node ->
-                    // Draw box
-                    drawRect(
-                        color = node.color,
-                        topLeft = Offset(node.position.x - 100, node.position.y - 30),
-                        size = androidx.compose.ui.geometry.Size(200f, 60f)
-                    )
-                    
-                    // Draw text using TextMeasurer
-                    drawText(
-                        textMeasurer = textMeasurer,
-                        text = node.name,
-                        topLeft = Offset(node.position.x - 90, node.position.y - 10),
-                        style = TextStyle(
-                            color = Color.Black,
-                            fontSize = 14.sp
-                        )
-                    )
-                }
+            }
+            // Overlay NodeBoxes at calculated positions
+            architecture.getAllNodes().forEach { node ->
+                val pos = nodePositions[node.id] ?: return@forEach
+                val isHighlighted = node.id in highlightIds
+                val isBlurred = selectedNodeId != null && !isHighlighted
+                NodeBox(
+                    name = node.name,
+                    modifier = Modifier
+                        .padding(0.dp)
+                        .background(Color.Transparent)
+                        .padding(start = pos.x.dp, top = pos.y.dp)
+                        .graphicsLayer { alpha = if (isBlurred) 0.3f else 1f }
+                        .clickable { selectedNodeId = node.id },
+                    boxColor = if (isHighlighted) Color(0xFF2D2236) else Color(0xFF23192D),
+                    borderColor = if (isHighlighted) Color(0xFFB83B5E) else node.color,
+                    boxWidth = nodeBoxWidth.dp,
+                    boxHeight = nodeBoxHeight.dp
+                )
             }
         }
     }
 }
 
-fun main() = application {
-    Window(
+fun main() = androidx.compose.ui.window.application {
+    androidx.compose.ui.window.Window(
         onCloseRequest = ::exitApplication,
         title = "Architecture Visualization"
     ) {

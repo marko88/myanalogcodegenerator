@@ -32,7 +32,9 @@ object TestData {
                     type = DependencyType.USES,
                     description = "Handles book rental"
                 )
-            )
+            ),
+            attributes = listOf("books: List<Book>", "selectedBook: Book?", "isLoading: Boolean", "error: String?"),
+            methods = listOf("loadBooks()", "selectBook(book: Book)", "rentBook(book: Book)", "showError(message: String)")
         )
 
         // Domain Layer - Use Cases
@@ -50,7 +52,9 @@ object TestData {
                     type = DependencyType.USES,
                     description = "Gets books from repository"
                 )
-            )
+            ),
+            attributes = listOf("repository: BooksRepository", "cache: List<Book>"),
+            methods = listOf("execute(): List<Book>", "clearCache()")
         )
 
         val getRentedBooksUseCase = ArchitectureNode(
@@ -67,7 +71,9 @@ object TestData {
                     type = DependencyType.USES,
                     description = "Gets rented books from repository"
                 )
-            )
+            ),
+            attributes = listOf("repository: BooksRepository", "rentedBooks: List<Book>"),
+            methods = listOf("execute(): List<Book>", "filterRentedBooks(): List<Book>")
         )
 
         val rentBookUseCase = ArchitectureNode(
@@ -89,7 +95,9 @@ object TestData {
                     type = DependencyType.USES,
                     description = "Tracks book rental events"
                 )
-            )
+            ),
+            attributes = listOf("repository: BooksRepository", "analytics: AnalyticsService", "lastRented: Book?"),
+            methods = listOf("execute(book: Book)", "validateRental(book: Book): Boolean")
         )
 
         // Data Layer - Repository
@@ -112,7 +120,9 @@ object TestData {
                     type = DependencyType.USES,
                     description = "Remote data source for books"
                 )
-            )
+            ),
+            attributes = listOf("localDataSource: BooksLocalDataSource", "remoteDataSource: BooksRemoteDataSource", "cache: List<Book>"),
+            methods = listOf("getBooks(): List<Book>", "rentBook(book: Book)", "clearCache()", "findBookById(id: String): Book?")
         )
 
         // Data Layer - Data Sources
@@ -130,7 +140,9 @@ object TestData {
                     type = DependencyType.USES,
                     description = "Room database for local storage"
                 )
-            )
+            ),
+            attributes = listOf("db: RoomDatabase", "lastSync: Long"),
+            methods = listOf("getBooks(): List<Book>", "saveBook(book: Book)", "deleteBook(book: Book)")
         )
 
         val booksRemoteDataSource = ArchitectureNode(
@@ -147,7 +159,9 @@ object TestData {
                     type = DependencyType.USES,
                     description = "Books API service"
                 )
-            )
+            ),
+            attributes = listOf("api: BooksApiService", "lastFetched: Long"),
+            methods = listOf("getBooks(): List<Book>", "fetchBookById(id: String): Book?")
         )
 
         // Framework Layer
@@ -159,7 +173,9 @@ object TestData {
             description = "Room database for local storage",
             color = Color(0xFF9C27B0), // Material Purple
             position = Offset(200f, 500f),
-            dependencies = emptyList()
+            dependencies = emptyList(),
+            attributes = listOf("tables: List<Table>", "version: Int"),
+            methods = listOf("query(sql: String): Cursor", "upgradeSchema(newVersion: Int)")
         )
 
         val booksApi = ArchitectureNode(
@@ -170,7 +186,9 @@ object TestData {
             description = "Retrofit API service for books",
             color = Color(0xFF9C27B0),
             position = Offset(600f, 500f),
-            dependencies = emptyList()
+            dependencies = emptyList(),
+            attributes = listOf("baseUrl: String", "timeout: Int"),
+            methods = listOf("getBooks(): List<Book>", "getBookById(id: String): Book?")
         )
 
         val analyticsService = ArchitectureNode(
@@ -181,7 +199,9 @@ object TestData {
             description = "Service for tracking analytics events",
             color = Color(0xFF9C27B0),
             position = Offset(400f, 500f),
-            dependencies = emptyList()
+            dependencies = emptyList(),
+            attributes = listOf("events: List<Event>", "enabled: Boolean"),
+            methods = listOf("trackEvent(event: Event)", "enableTracking()", "disableTracking()")
         )
 
         // Add all nodes to the architecture

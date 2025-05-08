@@ -15,7 +15,9 @@ data class ArchitectureNode(
     val color: Color = Color.Gray,     // Visualization color
     var position: Offset = Offset.Zero, // Position in the diagram
     val dependencies: List<NodeDependency> = emptyList(), // Direct dependencies
-    val dependencyChains: List<DependencyChain> = emptyList() // Complete dependency chains this node is part of
+    val dependencyChains: List<DependencyChain> = emptyList(), // Complete dependency chains this node is part of
+    val attributes: List<String> = emptyList(),   // Attributes for the node
+    val methods: List<String> = emptyList()       // Methods for the node
 )
 
 /**

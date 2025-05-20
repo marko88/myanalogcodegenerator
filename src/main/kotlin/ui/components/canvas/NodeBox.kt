@@ -1,5 +1,6 @@
 package ui.components.canvas
 
+import NodeBoxState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -17,59 +19,45 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import domain.model.ArchitectureNode
+import ui.components.canvas.CanvasGUIConstants.nodeBoxHeight
+import ui.components.canvas.CanvasGUIConstants.nodeBoxWidth
 
 @Composable
 fun NodeBox(
-    name: String,
-    attributes: List<String> = emptyList(),
-    methods: List<String> = emptyList(),
+    node: ArchitectureNode,
+    state: NodeBoxState,
     showDetails: Boolean = true,
     modifier: Modifier = Modifier,
-    boxColor: Color = Color(0xFF23192D),
-    borderColor: Color = Color(0xFFB83B5E),
-    labelBgColor: Color = Color(0xFF181926),
-    labelTextColor: Color = Color(0xFFF8E1F4),
-    boxWidth: Dp = 480.dp,
-    boxHeight: Dp = 80.dp,
+    boxWidth: Dp = nodeBoxWidth.dp,
+    boxHeight: Dp = nodeBoxHeight.dp,
     borderWidth: Dp = 1.dp,
     cornerRadius: Dp = 6.dp,
 ) {
     Box(
         modifier = modifier
-            .size(width = boxWidth, height = boxHeight)
+            .size(boxWidth, boxHeight)
             .clip(RoundedCornerShape(cornerRadius))
-            .background(boxColor)
-            .border(borderWidth, borderColor, RoundedCornerShape(cornerRadius))
+            .background(state.backgroundColor)
+            .border(borderWidth, state.borderColor, RoundedCornerShape(cornerRadius))
+            .graphicsLayer { alpha = state.alpha }
     ) {
         // Pill-shaped title box at the top left, perfectly aligned
         Box(
             modifier = Modifier
+                .align(Alignment.TopStart)
                 .wrapContentHeight()
-                .wrapContentWidth()
-                .background(
-                    labelBgColor,
-                    shape = RoundedCornerShape(
-                        topStart = cornerRadius,
-                        bottomEnd = cornerRadius
-                    )
-                )
-                .border(
-                    borderWidth, borderColor, RoundedCornerShape(
-                        topStart = cornerRadius,
-                        bottomEnd = cornerRadius
-                    )
-                )
-                .padding(horizontal = 10.dp, vertical = 2.dp),
-            contentAlignment = Alignment.Center
+                .background(state.borderColor, shape = RoundedCornerShape(6.dp))
         ) {
             Text(
-                text = name,
-                color = Color.White,
-                fontSize = 9.sp,
-                fontWeight = FontWeight.Normal,
+                text = node.name,
+                color = state.labelBgColor,
                 textAlign = TextAlign.Center,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(horizontal = 6.dp)
             )
         }
         if (showDetails) {
@@ -79,11 +67,11 @@ fun NodeBox(
                     .padding(top = 20.dp, start = 8.dp, end = 8.dp, bottom = 8.dp)
                     .fillMaxWidth()
             ) {
-                if (attributes.isNotEmpty()) {
-                    attributes.forEach {
+                if (node.attributes.isNotEmpty()) {
+                    node.attributes.forEach {
                         Text(
                             text = it,
-                            color = Color.White, // blueish for attributes
+                            color = Color.White,
                             fontSize = 9.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -91,14 +79,14 @@ fun NodeBox(
                         )
                     }
                 }
-                if (attributes.isNotEmpty() && methods.isNotEmpty()) {
+                if (node.attributes.isNotEmpty() && node.methods.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(2.dp))
                 }
-                if (methods.isNotEmpty()) {
-                    methods.forEach {
+                if (node.methods.isNotEmpty()) {
+                    node.methods.forEach {
                         Text(
                             text = it,
-                            color = Color(0xFFB8FFB8), // greenish for methods
+                            color = Color(0xFFB8FFB8),
                             fontSize = 9.sp,
                             fontFamily = FontFamily.Monospace,
                             fontWeight = FontWeight.Medium,

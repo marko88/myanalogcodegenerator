@@ -9,10 +9,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import domain.model.ArchitectureLayer
 import domain.model.TestData
+import ui.components.canvas.CanvasGUIConstants
+import ui.components.canvas.CanvasGUIConstants.nodeBoxHeight
+import ui.components.canvas.CanvasGUIConstants.nodeBoxWidth
 import ui.components.canvas.NodeBox
 import ui.components.canvas.Canvas as InteractiveCanvas
 
@@ -22,23 +24,17 @@ fun App() {
     val nodesByLayer = ArchitectureLayer.values().map { layer ->
         layer to architecture.getNodesByType(layer).toList()
     }
-
-    // Layout constants
-    val layerSpacing = 160f
-    val nodeSpacing = 200f // More space for wider boxes
     val startX = 100f
     val startY = 80f
-    val nodeBoxWidth = 180f
-    val nodeBoxHeight = 80f
 
     // Calculate node positions (auto-layout)
     val nodePositions = mutableMapOf<String, Offset>()
-    nodesByLayer.forEachIndexed { layerIndex, (layer, nodes) ->
-        val y = startY + layerIndex * layerSpacing
-        val totalWidth = (nodes.size - 1) * nodeSpacing
+    nodesByLayer.forEachIndexed { layerIndex, (_, nodes) ->
+        val y = startY + layerIndex * CanvasGUIConstants.layerSpacing
+        val totalWidth = (nodes.size - 1) * CanvasGUIConstants.nodeSpacing
         val layerStartX = startX + if (nodes.size > 1) 0f else totalWidth / 2
         nodes.forEachIndexed { nodeIndex, node ->
-            val x = layerStartX + nodeIndex * nodeSpacing
+            val x = layerStartX + nodeIndex * CanvasGUIConstants.nodeSpacing
             nodePositions[node.id] = Offset(x, y)
             println("Calculated position for ${node.name}: x=$x, y=$y")
         }
@@ -122,25 +118,25 @@ fun App() {
                         val isHighlighted = node.id in highlightIds
                         val isBlurred = selectedNodeId != null && !isHighlighted
                         
+                        val nodeState = when {
+                            isHighlighted -> NodeBoxState.HIGHLIGHTED
+                            isBlurred -> NodeBoxState.BLURRED
+                            else -> NodeBoxState.NORMAL
+                        }
+                        
                         println("Rendering NodeBox for ${node.name} at position: $pos")
                         
                         Box(
                             modifier = Modifier
                                 .padding(start = pos.x.dp, top = pos.y.dp)
-                                .graphicsLayer { alpha = if (isBlurred) 0.3f else 1f }
                         ) {
                             NodeBox(
-                                name = node.name,
-                                attributes = node.attributes,
-                                methods = node.methods,
+                                node = node,
+                                state = nodeState,
                                 showDetails = true,
                                 modifier = Modifier
                                     .background(Color.Transparent)
-                                    .clickable { selectedNodeId = node.id },
-                                boxColor = if (isHighlighted) Color(0xFF2D2236) else Color(0xFF23192D),
-                                borderColor = if (isHighlighted) Color(0xFFB83B5E) else node.color,
-                                boxWidth = nodeBoxWidth.dp,
-                                boxHeight = nodeBoxHeight.dp
+                                    .clickable { selectedNodeId = node.id }
                             )
                         }
                     }

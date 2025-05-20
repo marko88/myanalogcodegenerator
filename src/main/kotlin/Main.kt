@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import domain.model.ArchitectureLayer
 import domain.model.TestData
 import ui.components.canvas.NodeBox
+import ui.components.canvas.Canvas as InteractiveCanvas
 
 @Composable
 fun App() {
@@ -39,6 +40,7 @@ fun App() {
         nodes.forEachIndexed { nodeIndex, node ->
             val x = layerStartX + nodeIndex * nodeSpacing
             nodePositions[node.id] = Offset(x, y)
+            println("Calculated position for ${node.name}: x=$x, y=$y")
         }
     }
 
@@ -57,59 +59,92 @@ fun App() {
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFF1A1B26))
-                .padding(24.dp)
                 .clickable { selectedNodeId = null } // Reset selection on background click
         ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                // Only show connections if a node is selected
-                if (selectedNode != null) {
-                    // Draw dependency lines/arrows from selected node
-                    selectedNode.dependencies.forEach { dep ->
-                        val from = nodePositions[selectedNode.id] ?: return@forEach
-                        val to = nodePositions[dep.targetId] ?: return@forEach
-                        drawLine(
-                            color = Color(0xFFB83B5E),
-                            start = Offset(from.x + nodeBoxWidth / 2, from.y + nodeBoxHeight / 2),
-                            end = Offset(to.x + nodeBoxWidth / 2, to.y + nodeBoxHeight / 2),
-                            strokeWidth = 3f
-                        )
+            InteractiveCanvas {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    // Draw lines in the same coordinate space as the nodes
+                    if (selectedNode != null) {
+                        Canvas(modifier = Modifier.fillMaxSize()) {
+                            // Draw dependency lines/arrows from selected node
+                            selectedNode.dependencies.forEach { dep ->
+                                val from = nodePositions[selectedNode.id] ?: return@forEach
+                                val to = nodePositions[dep.targetId] ?: return@forEach
+                                
+                                // Calculate center points of nodes
+                                val fromCenter = Offset(
+                                    x = (from.x + nodeBoxWidth / 2) * 2,
+                                    y = (from.y + nodeBoxHeight / 2) * 2
+                                )
+                                val toCenter = Offset(
+                                    x = (to.x + nodeBoxWidth / 2) * 2,
+                                    y = (to.y + nodeBoxHeight / 2) * 2
+                                )
+                                
+                                drawLine(
+                                    color = Color(0xFFB83B5E),
+                                    start = fromCenter,
+                                    end = toCenter,
+                                    strokeWidth = 3f
+                                )
+                            }
+                            
+                            // Draw lines from dependents to selected node
+                            architecture.getAllNodes().forEach { node ->
+                                if (node.dependencies.any { it.targetId == selectedNode.id }) {
+                                    val from = nodePositions[node.id] ?: return@forEach
+                                    val to = nodePositions[selectedNode.id] ?: return@forEach
+                                    
+                                    // Calculate center points of nodes
+                                    val fromCenter = Offset(
+                                        x = (from.x + nodeBoxWidth / 2) * 2,
+                                        y = (from.y + nodeBoxHeight / 2) * 2
+                                    )
+                                    val toCenter = Offset(
+                                        x = (to.x + nodeBoxWidth / 2) * 2,
+                                        y = (to.y + nodeBoxHeight / 2) * 2
+                                    )
+                                    
+                                    drawLine(
+                                        color = Color(0xFFB83B5E),
+                                        start = fromCenter,
+                                        end = toCenter,
+                                        strokeWidth = 3f
+                                    )
+                                }
+                            }
+                        }
                     }
-                    // Draw lines from dependents to selected node
+                    
+                    // Overlay NodeBoxes at calculated positions
                     architecture.getAllNodes().forEach { node ->
-                        if (node.dependencies.any { it.targetId == selectedNode.id }) {
-                            val from = nodePositions[node.id] ?: return@forEach
-                            val to = nodePositions[selectedNode.id] ?: return@forEach
-                            drawLine(
-                                color = Color(0xFFB83B5E),
-                                start = Offset(from.x + nodeBoxWidth / 2, from.y + nodeBoxHeight / 2),
-                                end = Offset(to.x + nodeBoxWidth / 2, to.y + nodeBoxHeight / 2),
-                                strokeWidth = 3f
+                        val pos = nodePositions[node.id] ?: return@forEach
+                        val isHighlighted = node.id in highlightIds
+                        val isBlurred = selectedNodeId != null && !isHighlighted
+                        
+                        println("Rendering NodeBox for ${node.name} at position: $pos")
+                        
+                        Box(
+                            modifier = Modifier
+                                .padding(start = pos.x.dp, top = pos.y.dp)
+                                .graphicsLayer { alpha = if (isBlurred) 0.3f else 1f }
+                        ) {
+                            NodeBox(
+                                name = node.name,
+                                attributes = node.attributes,
+                                methods = node.methods,
+                                showDetails = true,
+                                modifier = Modifier
+                                    .background(Color.Transparent)
+                                    .clickable { selectedNodeId = node.id },
+                                boxColor = if (isHighlighted) Color(0xFF2D2236) else Color(0xFF23192D),
+                                borderColor = if (isHighlighted) Color(0xFFB83B5E) else node.color,
+                                boxWidth = nodeBoxWidth.dp,
+                                boxHeight = nodeBoxHeight.dp
                             )
                         }
                     }
                 }
-            }
-            // Overlay NodeBoxes at calculated positions
-            architecture.getAllNodes().forEach { node ->
-                val pos = nodePositions[node.id] ?: return@forEach
-                val isHighlighted = node.id in highlightIds
-                val isBlurred = selectedNodeId != null && !isHighlighted
-                NodeBox(
-                    name = node.name,
-                    attributes = node.attributes,
-                    methods = node.methods,
-                    showDetails = true,
-                    modifier = Modifier
-                        .padding(0.dp)
-                        .background(Color.Transparent)
-                        .padding(start = pos.x.dp, top = pos.y.dp)
-                        .graphicsLayer { alpha = if (isBlurred) 0.3f else 1f }
-                        .clickable { selectedNodeId = node.id },
-                    boxColor = if (isHighlighted) Color(0xFF2D2236) else Color(0xFF23192D),
-                    borderColor = if (isHighlighted) Color(0xFFB83B5E) else node.color,
-                    boxWidth = nodeBoxWidth.dp,
-                    boxHeight = nodeBoxHeight.dp
-                )
             }
         }
     }

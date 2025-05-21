@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -20,7 +23,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import domain.model.ArchitectureNode
-import ui.components.canvas.CanvasGUIConstants.nodeBoxHeight
 import ui.components.canvas.CanvasGUIConstants.nodeBoxWidth
 
 @Composable
@@ -30,24 +32,31 @@ fun NodeBox(
     showDetails: Boolean = true,
     modifier: Modifier = Modifier,
     boxWidth: Dp = nodeBoxWidth.dp,
-    boxHeight: Dp = nodeBoxHeight.dp,
     borderWidth: Dp = 1.dp,
     cornerRadius: Dp = 6.dp,
+    onHeightMeasured: (Int) -> Unit = {}
 ) {
+    val density = LocalDensity.current
+    
     Box(
         modifier = modifier
-            .size(boxWidth, boxHeight)
+            .width(boxWidth)
+            .wrapContentHeight()
             .clip(RoundedCornerShape(cornerRadius))
             .background(state.backgroundColor)
             .border(borderWidth, state.borderColor, RoundedCornerShape(cornerRadius))
             .graphicsLayer { alpha = state.alpha }
+            .onGloballyPositioned { coordinates ->
+                onHeightMeasured(coordinates.size.height)
+            }
     ) {
         // Pill-shaped title box at the top left, perfectly aligned
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .wrapContentHeight()
-                .background(state.borderColor, shape = RoundedCornerShape(6.dp))
+                .wrapContentSize()
+                .background(state.borderColor, shape = RoundedCornerShape(6.dp)),
+            contentAlignment = Alignment.Center
         ) {
             Text(
                 text = node.name,

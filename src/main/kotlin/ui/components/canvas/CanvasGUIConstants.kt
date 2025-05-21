@@ -5,5 +5,5 @@ object CanvasGUIConstants {
     val nodeSpacing = 200f // More space for wider boxes
 
     val nodeBoxWidth = 180f
-    val nodeBoxHeight = 80f
+    val nodeBoxHeight = 220f
 }

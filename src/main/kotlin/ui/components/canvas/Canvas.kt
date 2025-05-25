@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import domain.model.ArchitectureLayer
 import domain.model.ArchitectureNode
 import domain.model.ArchitectureDefinitionModel
+import androidx.compose.ui.input.key.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 
 @Composable
 fun Canvas(
@@ -61,8 +63,38 @@ fun NodeLayout(
     onNodeSelected: (String) -> Unit
 ) {
     val state = remember { NodeLayoutState(architecture) }
+    var isCmdPressed by remember { mutableStateOf(false) }
+    var hoveredNodeId by remember { mutableStateOf<String?>(null) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .onKeyEvent { event ->
+                when (event.type) {
+                    KeyEventType.KeyDown -> {
+                        if (event.key == Key.MetaLeft || event.key == Key.MetaRight) {
+                            isCmdPressed = true
+                        }
+                    }
+                    KeyEventType.KeyUp -> {
+                        if (event.key == Key.MetaLeft || event.key == Key.MetaRight) {
+                            isCmdPressed = false
+                            state.stopConnecting()
+                            hoveredNodeId = null
+                        }
+                    }
+                }
+                false
+            }
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                state.stopConnecting()
+                state.selectNode(null)
+                hoveredNodeId = null
+            }
+    ) {
         // Draw connections
         NodeConnections(
             selectedNode = state.selectedNode,
@@ -81,8 +113,12 @@ fun NodeLayout(
             nodes.forEach { node ->
                 val isHighlighted = node.id in state.highlightIds
                 val isBlurred = state.selectedNodeId != null && !isHighlighted
+                val isConnecting = node.id == state.connectingNodeId
+                val isHovered = node.id == hoveredNodeId
                 
                 val nodeState = when {
+                    isConnecting -> NodeBoxState.CONNECTING
+                    isHovered && isCmdPressed -> NodeBoxState.CONNECTING
                     isHighlighted -> NodeBoxState.HIGHLIGHTED
                     isBlurred -> NodeBoxState.BLURRED
                     else -> NodeBoxState.NORMAL
@@ -116,8 +152,30 @@ fun NodeLayout(
                         modifier = Modifier
                             .background(Color.Transparent)
                             .clickable { 
-                                state.selectNode(node.id)
-                                onNodeSelected(node.id)
+                                if (isCmdPressed) {
+                                    state.startConnecting(node.id)
+                                } else {
+                                    state.selectNode(node.id)
+                                    onNodeSelected(node.id)
+                                }
+                            }
+                            .pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        val event = awaitPointerEvent()
+                                        when (event.type) {
+                                            androidx.compose.ui.input.pointer.PointerEventType.Enter -> {
+                                                if (isCmdPressed) {
+                                                    hoveredNodeId = node.id
+                                                }
+                                            }
+                                            androidx.compose.ui.input.pointer.PointerEventType.Exit -> {
+                                                hoveredNodeId = null
+                                            }
+                                            else -> {}
+                                        }
+                                    }
+                                }
                             }
                     )
                 }

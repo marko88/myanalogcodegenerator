@@ -19,6 +19,9 @@ class NodeLayoutState(
     var nodeSizes by mutableStateOf(mapOf<String, Offset>())
         private set
 
+    var connectingNodeId by mutableStateOf<String?>(null)
+        private set
+
     val selectedNode: ArchitectureNode?
         get() = selectedNodeId?.let { architecture.getNodeById(it) }
 
@@ -36,6 +39,14 @@ class NodeLayoutState(
 
     fun selectNode(nodeId: String?) {
         selectedNodeId = nodeId
+    }
+
+    fun startConnecting(nodeId: String) {
+        connectingNodeId = nodeId
+    }
+
+    fun stopConnecting() {
+        connectingNodeId = null
     }
 
     fun updateNodePosition(nodeId: String, position: Offset) {

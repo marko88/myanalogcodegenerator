@@ -25,7 +25,7 @@ fun Canvas(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    var scale by remember { mutableStateOf(1f) }
+    var scale by remember { mutableStateOf(1.0f) }
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
 
@@ -105,10 +105,9 @@ fun NodeLayout(
         )
 
         // Render nodes
-        var currentY = 80f
+        var currentY = 20f
         nodesByLayer.forEach { (layer, nodes) ->
-            var currentX = 80f
-            val maxHeight = nodes.maxOfOrNull { state.nodeSizes[it.id]?.y ?: 0f } ?: 0f
+            var currentX = 20f
             
             nodes.forEach { node ->
                 val isHighlighted = node.id in state.highlightIds
@@ -180,10 +179,11 @@ fun NodeLayout(
                     )
                 }
                 
-                currentX += 20f + (state.nodeSizes[node.id]?.x ?: 0f)
+                currentX += CanvasGUIConstants.nodeBoxWidth + 20f
             }
-            
-            currentY += maxHeight + 40f
+
+            val maxHeight = nodes.maxOfOrNull { state.nodeSizes[it.id]?.y ?: 0f } ?: 0f
+            currentY += maxHeight/2 + 40f
         }
     }
 } 

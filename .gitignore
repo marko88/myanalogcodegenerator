@@ -52,3 +52,6 @@ $RECYCLE.BIN/
 # Project specific
 *.properties
 !gradle.properties
+
+# Ignore all files in the ./kotlin folder
+/kotlin/

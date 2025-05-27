@@ -5,14 +5,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import domain.blueprint.CleanArchitectureBlueprint
 import domain.model.ArchitectureLayer
-import domain.model.TestData
 import ui.components.canvas.NodeLayout
 import ui.components.canvas.Canvas as InteractiveCanvas
 
 @Composable
 fun App() {
-    val architecture = TestData.createBookLibraryArchitecture()
+    val architecture = CleanArchitectureBlueprint.create()
     val nodesByLayer = ArchitectureLayer.values().map { layer ->
         layer to architecture.getNodesByType(layer).toList()
     }

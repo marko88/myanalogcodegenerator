@@ -9,10 +9,8 @@ import androidx.compose.ui.graphics.Color
 data class ArchitectureNode(
     val id: String,                    // Unique identifier
     val name: String,                  // Class name
-    val packageName: String,           // Package name
     val layer: ArchitectureLayer,      // Architectural layer
     val description: String = "",      // Component description
-    val color: Color = Color.Gray,     // Visualization color
     var position: Offset = Offset.Zero, // Position in the diagram
     val dependencies: List<NodeDependency> = emptyList(), // Direct dependencies
     val dependencyChains: List<DependencyChain> = emptyList(), // Complete dependency chains this node is part of
@@ -27,7 +25,8 @@ data class NodeDependency(
     val targetId: String,              // ID of the dependent node
     val type: DependencyType,          // Type of dependency
     val isExternal: Boolean = false,   // Whether the dependency is outside our architecture
-    val description: String = ""       // Optional description of the dependency relationship
+    val description: String = "" ,      // Optional description of the dependency relationship
+    val optional: Boolean = false
 )
 
 /**

@@ -17,7 +17,7 @@ class ArchitectureDefinitionModel {
         nodesById[node.id] = node
         nodesByName[node.name] = node
         nodesByType.getOrPut(node.layer) { mutableSetOf() }.add(node)
-        nodesByPackage.getOrPut(node.packageName) { mutableSetOf() }.add(node)
+        nodesByPackage.getOrPut(node.layer.packageName) { mutableSetOf() }.add(node)
     }
 
     /**

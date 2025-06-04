@@ -17,11 +17,26 @@ annotation class ArchitectureComponent(
 /**
  * Represents the architectural layers in Clean Architecture
  */
-enum class ArchitectureLayer {
-    PRESENTATION,  // UI, ViewModels, Presenters
-    DOMAIN,        // Use Cases, Domain Models
-    DATA,          // Repositories, Data Sources
-    FRAMEWORK      // External frameworks, libraries
+enum class ArchitectureLayer(
+    val packageName: String,
+    val color: Long
+) {
+    PRESENTATION(
+        packageName = "presentation",
+        color = 0xFFB983FF
+    ),  // UI, ViewModels, Presenters
+    DOMAIN(
+        packageName = "domain",
+        color = 0xFF5DE2E6
+    ),        // Use Cases, Domain Models
+    DATA(
+        packageName = "data",
+        color = 0xFFFAED7D
+    ),          // Repositories, Data Sources
+    FRAMEWORK(
+        packageName = "framework",
+        color = 0xFFFFB74D
+    )      // External frameworks, libraries
 }
 
 /**

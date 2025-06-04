@@ -11,10 +11,8 @@ object TestData {
         val booksLibraryViewModel = ArchitectureNode(
             id = "books_library_vm",
             name = "BooksLibraryViewModel",
-            packageName = "com.example.presentation.library",
             layer = ArchitectureLayer.PRESENTATION,
             description = "Main view model for the books library screen",
-            color = Color(0xFF2196F3), // Material Blue
             position = Offset(400f, 100f),
             dependencies = listOf(
                 NodeDependency(
@@ -41,10 +39,8 @@ object TestData {
         val getAllBooksUseCase = ArchitectureNode(
             id = "get_all_books_uc",
             name = "GetAllBooksUseCase",
-            packageName = "com.example.domain.usecase",
             layer = ArchitectureLayer.DOMAIN,
             description = "Use case for retrieving all books",
-            color = Color(0xFF4CAF50), // Material Green
             position = Offset(200f, 200f),
             dependencies = listOf(
                 NodeDependency(
@@ -60,10 +56,8 @@ object TestData {
         val getRentedBooksUseCase = ArchitectureNode(
             id = "get_rented_books_uc",
             name = "GetRentedBooksUseCase",
-            packageName = "com.example.domain.usecase",
             layer = ArchitectureLayer.DOMAIN,
             description = "Use case for retrieving rented books",
-            color = Color(0xFF4CAF50),
             position = Offset(400f, 200f),
             dependencies = listOf(
                 NodeDependency(
@@ -79,10 +73,8 @@ object TestData {
         val rentBookUseCase = ArchitectureNode(
             id = "rent_book_uc",
             name = "RentBookUseCase",
-            packageName = "com.example.domain.usecase",
             layer = ArchitectureLayer.DOMAIN,
             description = "Use case for renting a book",
-            color = Color(0xFF4CAF50),
             position = Offset(600f, 200f),
             dependencies = listOf(
                 NodeDependency(
@@ -104,10 +96,8 @@ object TestData {
         val booksRepository = ArchitectureNode(
             id = "books_repository",
             name = "BooksRepository",
-            packageName = "com.example.data.repository",
             layer = ArchitectureLayer.DATA,
             description = "Repository for book data operations",
-            color = Color(0xFFFF9800), // Material Orange
             position = Offset(400f, 300f),
             dependencies = listOf(
                 NodeDependency(
@@ -129,10 +119,8 @@ object TestData {
         val booksLocalDataSource = ArchitectureNode(
             id = "books_local_ds",
             name = "BooksLocalDataSource",
-            packageName = "com.example.data.source.local",
             layer = ArchitectureLayer.DATA,
             description = "Local data source for books using Room",
-            color = Color(0xFFFF9800),
             position = Offset(200f, 400f),
             dependencies = listOf(
                 NodeDependency(
@@ -148,10 +136,8 @@ object TestData {
         val booksRemoteDataSource = ArchitectureNode(
             id = "books_remote_ds",
             name = "BooksRemoteDataSource",
-            packageName = "com.example.data.source.remote",
             layer = ArchitectureLayer.DATA,
             description = "Remote data source for books using Retrofit",
-            color = Color(0xFFFF9800),
             position = Offset(600f, 400f),
             dependencies = listOf(
                 NodeDependency(
@@ -168,10 +154,8 @@ object TestData {
         val roomDatabase = ArchitectureNode(
             id = "room_database",
             name = "BooksDatabase",
-            packageName = "com.example.data.database",
             layer = ArchitectureLayer.FRAMEWORK,
             description = "Room database for local storage",
-            color = Color(0xFF9C27B0), // Material Purple
             position = Offset(200f, 500f),
             dependencies = emptyList(),
             attributes = listOf("tables: List<Table>", "version: Int"),
@@ -181,10 +165,8 @@ object TestData {
         val booksApi = ArchitectureNode(
             id = "books_api",
             name = "BooksApiService",
-            packageName = "com.example.data.api",
             layer = ArchitectureLayer.FRAMEWORK,
             description = "Retrofit API service for books",
-            color = Color(0xFF9C27B0),
             position = Offset(600f, 500f),
             dependencies = emptyList(),
             attributes = listOf("baseUrl: String", "timeout: Int"),
@@ -194,10 +176,8 @@ object TestData {
         val analyticsService = ArchitectureNode(
             id = "analytics_service",
             name = "AnalyticsService",
-            packageName = "com.example.data.analytics",
             layer = ArchitectureLayer.FRAMEWORK,
             description = "Service for tracking analytics events",
-            color = Color(0xFF9C27B0),
             position = Offset(400f, 500f),
             dependencies = emptyList(),
             attributes = listOf("events: List<Event>", "enabled: Boolean"),

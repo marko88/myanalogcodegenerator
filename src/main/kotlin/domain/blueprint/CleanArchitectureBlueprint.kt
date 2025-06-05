@@ -1,6 +1,9 @@
 package domain.blueprint
 
 import domain.model.*
+import domain.repository.ArchitectureDefinitionModel
+import domain.model.ArchitectureNode
+import domain.model.NodeDependency
 
 /**
  * Defines the blueprint for Clean Architecture using ArchitectureNode.

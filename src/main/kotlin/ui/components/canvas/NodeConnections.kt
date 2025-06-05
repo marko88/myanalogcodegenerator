@@ -3,7 +3,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import domain.model.ArchitectureDefinitionModel
+import domain.repository.ArchitectureDefinitionModel
 import domain.model.ArchitectureNode
 
 @Composable

@@ -16,30 +16,47 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.unit.dp
 import domain.model.ArchitectureLayer
 import domain.model.ArchitectureNode
-import domain.model.ArchitectureDefinitionModel
+import domain.model.ArchitectureModel
 import androidx.compose.ui.input.key.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import domain.repository.ArchitectureDefinitionModel
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun Canvas(
+    architectureModel: ArchitectureModel,
     modifier: Modifier = Modifier,
+    onDoubleClick: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
+    val architectureState = architectureModel.model.collectAsState()
+    val layoutState = remember { NodeLayoutState(architectureState) }
+
     var scale by remember { mutableStateOf(1.0f) }
     var offsetX by remember { mutableStateOf(0f) }
     var offsetY by remember { mutableStateOf(0f) }
+    var lastClickTime by remember { mutableStateOf(0L) }
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFF1E1E1E))
             .pointerInput(Unit) {
-                detectTransformGestures { centroid, pan, zoom, _ ->
-                    println("Zoom: $zoom, Pan: $pan") // Debug print
+                detectTransformGestures { _, pan, zoom, _ ->
                     scale = (scale * zoom).coerceIn(0.1f, 5f)
                     offsetX += pan.x
                     offsetY += pan.y
                 }
+            }
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastClickTime < 300) {
+                    onDoubleClick()
+                }
+                lastClickTime = currentTime
             }
     ) {
         Box(
@@ -53,16 +70,31 @@ fun Canvas(
         ) {
             content()
         }
+
+        NodeConnections(
+            selectedNode = layoutState.selectedNode,
+            architecture = architectureState.value,
+            nodePositions = layoutState.nodePositions,
+            nodeSizes = layoutState.nodeSizes,
+        )
     }
 }
 
+
 @Composable
 fun NodeLayout(
+    architectureModel: ArchitectureModel,
     nodesByLayer: List<Pair<ArchitectureLayer, List<ArchitectureNode>>>,
     architecture: ArchitectureDefinitionModel,
     onNodeSelected: (String) -> Unit
 ) {
-    val state = remember { NodeLayoutState(architecture) }
+    println("NodeLayout: Rendering with ${nodesByLayer.sumOf { it.second.size }} total nodes")
+    nodesByLayer.forEach { (layer, nodes) ->
+        println("NodeLayout: Layer ${layer.name} has ${nodes.size} nodes")
+    }
+
+    val architectureState = architectureModel.model.collectAsState()
+    val state = remember { NodeLayoutState(architectureState) }
     var isCmdPressed by remember { mutableStateOf(false) }
     var hoveredNodeId by remember { mutableStateOf<String?>(null) }
 
@@ -108,13 +140,14 @@ fun NodeLayout(
         var currentY = 20f
         nodesByLayer.forEach { (layer, nodes) ->
             var currentX = 20f
-            
+
             nodes.forEach { node ->
+                println("NodeLayout: Rendering node ${node.name} at position ($currentX, $currentY)")
                 val isHighlighted = node.id in state.highlightIds
                 val isBlurred = state.selectedNodeId != null && !isHighlighted
                 val isConnecting = node.id == state.connectingNodeId
                 val isHovered = node.id == hoveredNodeId
-                
+
                 val nodeState = when {
                     isConnecting -> NodeBoxState.CONNECTING
                     isHovered && isCmdPressed -> NodeBoxState.CONNECTING
@@ -122,7 +155,7 @@ fun NodeLayout(
                     isBlurred -> NodeBoxState.BLURRED
                     else -> NodeBoxState.NORMAL
                 }
-                
+
                 Box(
                     modifier = Modifier
                         .offset(
@@ -150,7 +183,7 @@ fun NodeLayout(
                         showDetails = true,
                         modifier = Modifier
                             .background(Color.Transparent)
-                            .clickable { 
+                            .clickable {
                                 if (isCmdPressed) {
                                     state.startConnecting(node.id)
                                 } else {
@@ -178,7 +211,7 @@ fun NodeLayout(
                             }
                     )
                 }
-                
+
                 currentX += CanvasGUIConstants.nodeBoxWidth + 20f
             }
 
@@ -186,4 +219,4 @@ fun NodeLayout(
             currentY += maxHeight/2 + 40f
         }
     }
-} 
+}

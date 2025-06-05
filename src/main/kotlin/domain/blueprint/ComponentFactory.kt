@@ -4,7 +4,6 @@ import domain.model.ArchitectureNode
 import domain.model.ArchitectureLayer
 import domain.model.DependencyType
 import domain.model.NodeDependency
-import androidx.compose.ui.graphics.Color
 
 /**
  * Factory class for creating Clean Architecture components.

@@ -5,11 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.runtime.State
-import domain.repository.ArchitectureDefinitionModel
+import domain.repository.ArchitectureDatabase
 import domain.model.ArchitectureNode
 
 class NodeLayoutState(
-    private val architectureState: State<ArchitectureDefinitionModel>
+    private val architectureState: State<ArchitectureDatabase>
 ) {
     var selectedNodeId by mutableStateOf<String?>(null)
         private set

@@ -11,20 +11,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import domain.model.ArchitectureLayer
-import domain.model.ArchitectureModel
 import domain.blueprint.ArchitectureUseCase
+import domain.repository.ArchitectureDatabase
 import kotlinx.coroutines.delay
+import myanalogcodegenerator.domain.repository.ArchitectureRepository
 import ui.components.canvas.NodeLayout
 import ui.components.canvas.Canvas as InteractiveCanvas
 
 @Composable
-fun App(architectureModel: ArchitectureModel) {
-    val architecture by architectureModel.model.collectAsState()
+fun App(architectureRepository: ArchitectureRepository) {
+    val architecture by architectureRepository.model.collectAsState()
     val nodesByLayer = ArchitectureLayer.values().map { layer ->
         layer to architecture.getAllNodes().filter { it.layer == layer }
     }
 
-    val architectureUseCase = ArchitectureUseCase(architectureModel)
+    val architectureUseCase = ArchitectureUseCase(architectureRepository)
 
     // Add delay and create Library feature
     var number = 1
@@ -45,12 +46,12 @@ fun App(architectureModel: ArchitectureModel) {
                 .fillMaxSize()
                 .background(Color(0xFF1A1B26))
         ) {
-            InteractiveCanvas(architectureModel) {
+            InteractiveCanvas(architectureRepository) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     NodeLayout(
                         nodesByLayer = nodesByLayer,
                         architecture = architecture,
-                        architectureModel = architectureModel,
+                        architectureRepository = architectureRepository,
                         onNodeSelected = { /* Handle node selection if needed */ }
                     )
                 }
@@ -60,12 +61,12 @@ fun App(architectureModel: ArchitectureModel) {
 }
 
 fun main() = androidx.compose.ui.window.application {
-    val architectureModel = ArchitectureModel()
+    val architectureRepository = ArchitectureRepository()
 
     androidx.compose.ui.window.Window(
         onCloseRequest = ::exitApplication,
         title = "Architecture Visualization"
     ) {
-        App(architectureModel)
+        App(architectureRepository)
     }
 }

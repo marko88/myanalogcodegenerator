@@ -3,13 +3,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import domain.repository.ArchitectureDefinitionModel
+import domain.repository.ArchitectureDatabase
 import domain.model.ArchitectureNode
 
 @Composable
 fun NodeConnections(
     selectedNode: ArchitectureNode?,
-    architecture: ArchitectureDefinitionModel,
+    architecture: ArchitectureDatabase,
     nodePositions: Map<String, Offset>,
     nodeSizes: Map<String, Offset>,
     modifier: Modifier = Modifier

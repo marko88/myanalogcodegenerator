@@ -74,7 +74,7 @@ fun NodeBox(
                 if (node.attributes.isNotEmpty()) {
                     node.attributes.forEach {
                         Text(
-                            text = it,
+                            text = it.name,
                             color = Color.White,
                             fontSize = 9.sp,
                             maxLines = 1,
@@ -89,7 +89,7 @@ fun NodeBox(
                 if (node.methods.isNotEmpty()) {
                     node.methods.forEach {
                         Text(
-                            text = it,
+                            text = it.name,
                             color = Color(0xFFB8FFB8),
                             fontSize = 9.sp,
                             fontFamily = FontFamily.Monospace,

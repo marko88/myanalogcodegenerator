@@ -16,20 +16,19 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.unit.dp
 import domain.model.ArchitectureLayer
 import domain.model.ArchitectureNode
-import domain.model.ArchitectureModel
 import androidx.compose.ui.input.key.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import domain.repository.ArchitectureDefinitionModel
-import kotlinx.coroutines.flow.collectLatest
+import domain.repository.ArchitectureDatabase
+import myanalogcodegenerator.domain.repository.ArchitectureRepository
 
 @Composable
 fun Canvas(
-    architectureModel: ArchitectureModel,
+    architectureRepository: ArchitectureRepository,
     modifier: Modifier = Modifier,
     onDoubleClick: () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
-    val architectureState = architectureModel.model.collectAsState()
+    val architectureState = architectureRepository.model.collectAsState()
     val layoutState = remember { NodeLayoutState(architectureState) }
 
     var scale by remember { mutableStateOf(1.0f) }
@@ -83,9 +82,9 @@ fun Canvas(
 
 @Composable
 fun NodeLayout(
-    architectureModel: ArchitectureModel,
+    architectureRepository: ArchitectureRepository,
     nodesByLayer: List<Pair<ArchitectureLayer, List<ArchitectureNode>>>,
-    architecture: ArchitectureDefinitionModel,
+    architecture: ArchitectureDatabase,
     onNodeSelected: (String) -> Unit
 ) {
     println("NodeLayout: Rendering with ${nodesByLayer.sumOf { it.second.size }} total nodes")
@@ -93,7 +92,7 @@ fun NodeLayout(
         println("NodeLayout: Layer ${layer.name} has ${nodes.size} nodes")
     }
 
-    val architectureState = architectureModel.model.collectAsState()
+    val architectureState = architectureRepository.model.collectAsState()
     val state = remember { NodeLayoutState(architectureState) }
     var isCmdPressed by remember { mutableStateOf(false) }
     var hoveredNodeId by remember { mutableStateOf<String?>(null) }

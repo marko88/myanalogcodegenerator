@@ -1,17 +1,17 @@
 package domain.blueprint
 
 import domain.model.ArchitectureNode
-import domain.model.ArchitectureModel
 import domain.model.ArchitectureLayer
 import domain.model.DependencyType
 import domain.model.NodeDependency
+import myanalogcodegenerator.domain.repository.ArchitectureRepository
 
 /**
  * UseCase for managing architecture components and their relationships.
  * Uses ComponentFactory to create components and ArchitectureModel to manage state.
  */
 class ArchitectureUseCase(
-    private val architectureModel: ArchitectureModel
+    private val architectureModel: ArchitectureRepository,
 ) {
     /**
      * Creates a new feature structure and adds it to the architecture model
@@ -62,11 +62,11 @@ class ArchitectureUseCase(
         sourceId: String,
         targetId: String,
         type: DependencyType,
-        description: String = ""
+        description: String = "",
     ) {
         val sourceNode = architectureModel.getNodeById(sourceId)
         val targetNode = architectureModel.getNodeById(targetId)
-        
+
         if (sourceNode != null && targetNode != null) {
             val dependency = NodeDependency(
                 targetId = targetId,

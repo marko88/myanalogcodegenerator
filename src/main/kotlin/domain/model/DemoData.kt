@@ -7,88 +7,119 @@ import domain.repository.ArchitectureDatabase
 object DemoData {
 
     fun createDemoArchitecture(): ArchitectureDatabase {
-        val presenter = ArchitectureNode(
+        val presenter1 = ArchitectureNode(
             id = "presenter1",
             name = "LibraryPresenter",
             layer = ArchitectureLayer.PRESENTATION,
-            position = Offset(100f, 100f),
-            methods = listOf(
-                NodeMethod("renderLibrary", "Unit", semantics = DataFlowSemantics.Event)
-            )
+            type = ArchitectureNodeType.PRESENTER,
+            methods = listOf(NodeMethod("renderLibrary", "Unit", semantics = DataFlowSemantics.Event))
         )
 
-        val viewModel = ArchitectureNode(
+        val presenter2 = ArchitectureNode(
+            id = "presenter2",
+            name = "AccountPresenter",
+            layer = ArchitectureLayer.PRESENTATION,
+            type = ArchitectureNodeType.PRESENTER,
+            methods = listOf(NodeMethod("renderUser", "Unit", semantics = DataFlowSemantics.Event))
+        )
+
+        val view1 = ArchitectureNode(
+            id = "view1",
+            name = "LibraryScreen",
+            layer = ArchitectureLayer.PRESENTATION,
+            type = ArchitectureNodeType.VIEW,
+            methods = listOf(NodeMethod("onBookClick", "Unit", listOf("bookId" to "String"), semantics = DataFlowSemantics.Event)),
+            attributes = listOf(NodeAttribute("books", "List<Book>", isReactive = true, semantics = DataFlowSemantics.State))
+        )
+
+        val view2 = ArchitectureNode(
+            id = "view2",
+            name = "AccountScreen",
+            layer = ArchitectureLayer.PRESENTATION,
+            type = ArchitectureNodeType.VIEW,
+            methods = listOf(NodeMethod("onLogout", "Unit", semantics = DataFlowSemantics.Command)),
+            attributes = listOf(NodeAttribute("userName", "String", isReactive = true, semantics = DataFlowSemantics.State))
+        )
+
+        val viewModel1 = ArchitectureNode(
             id = "viewModel1",
             name = "LibraryViewModel",
             layer = ArchitectureLayer.PRESENTATION,
-            position = Offset(250f, 100f),
+            type = ArchitectureNodeType.VIEWMODEL,
+            attributes = listOf(
+                NodeAttribute("books", "Flow<List<Book>>", isReactive = true, semantics = DataFlowSemantics.State),
+                NodeAttribute("loading", "Boolean", isReactive = true, semantics = DataFlowSemantics.State)
+            ),
             methods = listOf(
                 NodeMethod("loadBooks", "Unit", semantics = DataFlowSemantics.Command),
-                NodeMethod("observeBooks", "Flow<List<Book>>", semantics = DataFlowSemantics.State)
+                NodeMethod("refreshBooks", "Unit", semantics = DataFlowSemantics.Command)
             )
         )
 
-        val useCase = ArchitectureNode(
+        val viewModel2 = ArchitectureNode(
+            id = "viewModel2",
+            name = "AccountViewModel",
+            layer = ArchitectureLayer.PRESENTATION,
+            type = ArchitectureNodeType.VIEWMODEL,
+            attributes = listOf(
+                NodeAttribute("user", "Flow<User>", isReactive = true, semantics = DataFlowSemantics.State)
+            ),
+            methods = listOf(
+                NodeMethod("loadUser", "Unit", semantics = DataFlowSemantics.Command)
+            )
+        )
+
+        val useCase1 = ArchitectureNode(
             id = "useCase1",
             name = "GetBooksUseCase",
             layer = ArchitectureLayer.DOMAIN,
-            position = Offset(400f, 200f),
-            methods = listOf(
-                NodeMethod("execute", "Flow<List<Book>>", semantics = DataFlowSemantics.Response)
-            )
+            type = ArchitectureNodeType.USE_CASE,
+            methods = listOf(NodeMethod("execute", "Flow<List<Book>>", semantics = DataFlowSemantics.Response))
         )
 
-        val repository = ArchitectureNode(
+        val useCase2 = ArchitectureNode(
+            id = "useCase2",
+            name = "GetUserUseCase",
+            layer = ArchitectureLayer.DOMAIN,
+            type = ArchitectureNodeType.USE_CASE,
+            methods = listOf(NodeMethod("execute", "Flow<User>", semantics = DataFlowSemantics.Response))
+        )
+
+        val repository1 = ArchitectureNode(
             id = "repo1",
             name = "BookRepository",
             layer = ArchitectureLayer.DATA,
-            position = Offset(550f, 300f),
-            methods = listOf(
-                NodeMethod("getAllBooks", "Flow<List<Book>>", semantics = DataFlowSemantics.Response)
-            )
+            type = ArchitectureNodeType.REPOSITORY,
+            methods = listOf(NodeMethod("getAllBooks", "Flow<List<Book>>", semantics = DataFlowSemantics.Response))
+        )
+
+        val repository2 = ArchitectureNode(
+            id = "repo2",
+            name = "UserRepository",
+            layer = ArchitectureLayer.DATA,
+            type = ArchitectureNodeType.REPOSITORY,
+            methods = listOf(NodeMethod("getUser", "Flow<User>", semantics = DataFlowSemantics.Response))
         )
 
         val database = ArchitectureNode(
             id = "db1",
-            name = "BookDatabase",
+            name = "AppDatabase",
             layer = ArchitectureLayer.DATA,
-            position = Offset(700f, 400f),
-            attributes = listOf(
-                NodeAttribute("books", "List<Book>", isReactive = true, semantics = DataFlowSemantics.State)
-            )
+            type = ArchitectureNodeType.DATABASE,
+            attributes = listOf(NodeAttribute("books", "List<Book>", isReactive = true, semantics = DataFlowSemantics.State))
         )
 
         return ArchitectureDatabase()
-            .addNode(presenter.copy(dependencies = listOf(
-                NodeDependency("viewModel1", DependencyType.CONSTRUCTOR_INJECTION)
-            )))
-            .addNode(viewModel.copy(dependencies = listOf(
-                NodeDependency("useCase1", DependencyType.CONSTRUCTOR_INJECTION)
-            )))
-            .addNode(useCase.copy(dependencies = listOf(
-                NodeDependency("repo1", DependencyType.CONSTRUCTOR_INJECTION)
-            )))
-            .addNode(repository.copy(dependencies = listOf(
-                NodeDependency("db1", DependencyType.CONSTRUCTOR_INJECTION)
-            )))
+            .addNode(presenter1.copy(dependencies = listOf(NodeDependency("viewModel1", DependencyType.CONSTRUCTOR_INJECTION))))
+            .addNode(presenter2.copy(dependencies = listOf(NodeDependency("viewModel2", DependencyType.CONSTRUCTOR_INJECTION))))
+            .addNode(view1.copy(dependencies = listOf(NodeDependency("viewModel1", DependencyType.OBSERVES))))
+            .addNode(view2.copy(dependencies = listOf(NodeDependency("viewModel2", DependencyType.OBSERVES))))
+            .addNode(viewModel1.copy(dependencies = listOf(NodeDependency("useCase1", DependencyType.CONSTRUCTOR_INJECTION))))
+            .addNode(viewModel2.copy(dependencies = listOf(NodeDependency("useCase2", DependencyType.CONSTRUCTOR_INJECTION))))
+            .addNode(useCase1.copy(dependencies = listOf(NodeDependency("repo1", DependencyType.CONSTRUCTOR_INJECTION))))
+            .addNode(useCase2.copy(dependencies = listOf(NodeDependency("repo2", DependencyType.CONSTRUCTOR_INJECTION))))
+            .addNode(repository1.copy(dependencies = listOf(NodeDependency("db1", DependencyType.CONSTRUCTOR_INJECTION))))
+            .addNode(repository2.copy(dependencies = listOf(NodeDependency("db1", DependencyType.CONSTRUCTOR_INJECTION))))
             .addNode(database)
-            .addDataFlow(
-                DataFlowConnection(
-                    fromNodeId = "useCase1",
-                    fromSymbol = "execute",
-                    toNodeId = "viewModel1",
-                    toSymbol = "observeBooks",
-                    semantics = DataFlowSemantics.Stream
-                )
-            )
-            .addDataFlow(
-                DataFlowConnection(
-                    fromNodeId = "viewModel1",
-                    fromSymbol = "observeBooks",
-                    toNodeId = "presenter1",
-                    toSymbol = "renderLibrary",
-                    semantics = DataFlowSemantics.Event
-                )
-            )
     }
 }

@@ -4,48 +4,40 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import kotlinx.coroutines.launch
 import myanalogcodegenerator.domain.repository.ArchitectureRepository
-import myanalogcodegenerator.ui.components.canvas.NodeLayout
-import myanalogcodegenerator.ui.components.layout.rememberCanvasTransform
+import myanalogcodegenerator.ui.components.canvas.LayeredNodeLayout
 
 @Composable
-fun CanvasView(
-    architectureRepository: ArchitectureRepository,
-    modifier: Modifier = Modifier.fillMaxSize().background(Color(0xFF1A1B26))
-) {
-    val architecture = architectureRepository.model.collectAsState().value
-    val transformState = rememberCanvasTransform()
-    val scope = rememberCoroutineScope()
+fun CanvasView(architectureRepository: ArchitectureRepository) {
+    val architecture by architectureRepository.model.collectAsState()
+    val nodes = architecture.getAllNodes().toList()
+
+    var scale by remember { mutableStateOf(1f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
 
     Box(
-        modifier = modifier
+        modifier = Modifier
+            .fillMaxSize()
             .pointerInput(Unit) {
                 detectTransformGestures { _, pan, zoom, _ ->
-                    scope.launch {
-                        transformState.zoom(zoom)
-                        transformState.pan(pan)
-                    }
+                    scale *= zoom
+                    offset += pan
                 }
             }
             .graphicsLayer(
-                scaleX = transformState.scale,
-                scaleY = transformState.scale,
-                translationX = transformState.offset.x,
-                translationY = transformState.offset.y
+                scaleX = scale,
+                scaleY = scale,
+                translationX = offset.x,
+                translationY = offset.y
             )
+            .background(color = androidx.compose.ui.graphics.Color(0xFF1A1B26))
     ) {
-        NodeLayout(
-            nodes = architecture.getAllNodes().toList(),
-            getStateForNode = { NodeBoxState.NORMAL }
-        )
+        LayeredNodeLayout(nodes = nodes)
     }
 }
 

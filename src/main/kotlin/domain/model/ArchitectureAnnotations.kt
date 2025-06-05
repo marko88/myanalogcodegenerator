@@ -33,8 +33,8 @@ enum class ArchitectureLayer(
         packageName = "data",
         color = 0xFFFAED7D
     ),          // Repositories, Data Sources
-    FRAMEWORK(
-        packageName = "framework",
+    OTHER(
+        packageName = "other",
         color = 0xFFFFB74D
     )      // External frameworks, libraries
 }

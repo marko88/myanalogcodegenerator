@@ -2,19 +2,21 @@ package domain.model
 
 import androidx.compose.ui.geometry.Offset
 
-/**
- * Represents a node in the architecture graph
- */
+enum class ArchitectureNodeType {
+    VIEW, VIEWMODEL, PRESENTER, USE_CASE, REPOSITORY, DATABASE, OTHER
+}
+
 data class ArchitectureNode(
-    val id: String,                    // Unique identifier
-    val name: String,                  // Class name
-    val layer: ArchitectureLayer,      // Architectural layer
-    val description: String = "",      // Component description
-    var position: Offset = Offset.Zero, // Position in the diagram
-    val dependencies: List<NodeDependency> = emptyList(), // Direct dependencies
-    val dependencyChains: List<DependencyChain> = emptyList(), // Complete dependency chains this node is part of
-    val attributes: List<NodeAttribute> = emptyList(),   // Attributes for the node
-    val methods: List<NodeMethod> = emptyList(),       // Methods for the node
+    val id: String,
+    val name: String,
+    val layer: ArchitectureLayer,
+    val type: ArchitectureNodeType = ArchitectureNodeType.OTHER,
+    val description: String = "",
+    var position: Offset = Offset.Zero,
+    val dependencies: List<NodeDependency> = emptyList(),
+    val dependencyChains: List<DependencyChain> = emptyList(),
+    val attributes: List<NodeAttribute> = emptyList(),
+    val methods: List<NodeMethod> = emptyList()
 )
 
 /**

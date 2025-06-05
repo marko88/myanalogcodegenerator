@@ -7,21 +7,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import domain.model.ArchitectureNode
-import ui.components.canvas.NodeBox
-import ui.components.canvas.NodeBoxState
+import myanalogcodegenerator.ui.components.canvas.node.NodeBox
+import ui.components.canvas.NodeSelectionState
 
 @Composable
 fun NodeLayout(
     nodes: List<ArchitectureNode>,
     modifier: Modifier = Modifier,
-    getStateForNode: (ArchitectureNode) -> NodeBoxState
+    getStateForNode: (ArchitectureNode) -> NodeSelectionState
 ) {
     BoxWithConstraints(modifier = modifier) {
         nodes.forEach { node ->
             val state = getStateForNode(node)
             NodeBox(
                 node = node,
-                state = state,
                 modifier = Modifier.offset {
                     IntOffset(node.position.x.toInt(), node.position.y.toInt())
                 }

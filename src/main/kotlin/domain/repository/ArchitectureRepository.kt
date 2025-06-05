@@ -6,10 +6,14 @@ import domain.model.NodeDependency
 import domain.repository.ArchitectureDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import myanalogcodegenerator.ui.components.canvas.SelectableEntity
 
 class ArchitectureRepository {
     private val _model = MutableStateFlow(ArchitectureDatabase())
     val model: StateFlow<ArchitectureDatabase> = _model
+
+    private val _selection = MutableStateFlow<Set<SelectableEntity>>(emptySet())
+    val selection: StateFlow<Set<SelectableEntity>> = _selection
 
     fun addNode(node: ArchitectureNode) {
         _model.value = _model.value.addNode(node)
@@ -43,5 +47,23 @@ class ArchitectureRepository {
 
     fun clear() {
         _model.value = ArchitectureDatabase()
+        _selection.value = emptySet()
+    }
+
+    // Selection management
+    fun toggleSelection(entity: SelectableEntity) {
+        _selection.value = if (_selection.value.contains(entity)) {
+            _selection.value - entity
+        } else {
+            _selection.value + entity
+        }
+    }
+
+    fun clearSelection() {
+        _selection.value = emptySet()
+    }
+
+    fun isSelected(entity: SelectableEntity): Boolean {
+        return _selection.value.contains(entity)
     }
 }

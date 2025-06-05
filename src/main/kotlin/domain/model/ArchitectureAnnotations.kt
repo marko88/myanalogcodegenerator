@@ -47,5 +47,9 @@ enum class DependencyType {
     IMPLEMENTS,    // Component implements an interface
     EXTENDS,       // Component extends another class
     USES,          // Component uses another component
-    OBSERVES       // Component observes another component (e.g., LiveData, Flow)
+    OBSERVES,       // Component observes another component (e.g., LiveData, Flow)
+    // More specific for generation/visual clarity
+    CONSTRUCTOR_INJECTION,   // Injected via constructor (e.g., Dagger/Hilt/Koin)
+    FIELD_INJECTION,         // Injected via property/field
+    METHOD_INJECTION         // Injected via method or setter
 } 

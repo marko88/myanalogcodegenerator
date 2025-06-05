@@ -6,39 +6,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import domain.model.ArchitectureLayer
-import domain.blueprint.ArchitectureUseCase
-import domain.repository.ArchitectureDatabase
-import kotlinx.coroutines.delay
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import myanalogcodegenerator.domain.model.DemoData
 import myanalogcodegenerator.domain.repository.ArchitectureRepository
-import ui.components.canvas.NodeLayout
-import ui.components.canvas.Canvas as InteractiveCanvas
+import ui.components.canvas.CanvasView
 
 @Composable
 fun App(architectureRepository: ArchitectureRepository) {
-    val architecture by architectureRepository.model.collectAsState()
-    val nodesByLayer = ArchitectureLayer.values().map { layer ->
-        layer to architecture.getAllNodes().filter { it.layer == layer }
-    }
-
-    val architectureUseCase = ArchitectureUseCase(architectureRepository)
-
-    // Add delay and create Library feature
-    var number = 1
-    LaunchedEffect(Unit) {
-        delay(1000)
-        println("Creating Library feature...")
-        architectureUseCase.createFeature("Library)"+number++, includeViewModel = true)
-        println("Library feature created. Total nodes: ${architecture.getAllNodes().size}")
-        println("Nodes by layer:")
-        ArchitectureLayer.values().forEach { layer ->
-            println("${layer.name}: ${architecture.getNodesByType(layer).size} nodes")
-        }
-    }
+    val architecture = architectureRepository.model.collectAsState().value
 
     MaterialTheme {
         Box(
@@ -46,24 +24,17 @@ fun App(architectureRepository: ArchitectureRepository) {
                 .fillMaxSize()
                 .background(Color(0xFF1A1B26))
         ) {
-            InteractiveCanvas(architectureRepository) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    NodeLayout(
-                        nodesByLayer = nodesByLayer,
-                        architecture = architecture,
-                        architectureRepository = architectureRepository,
-                        onNodeSelected = { /* Handle node selection if needed */ }
-                    )
-                }
-            }
+            CanvasView(architectureRepository)
         }
     }
 }
 
-fun main() = androidx.compose.ui.window.application {
-    val architectureRepository = ArchitectureRepository()
+fun main() = application {
+    val architectureRepository = ArchitectureRepository().apply {
+        updateModel(DemoData.createDemoArchitecture())
+    }
 
-    androidx.compose.ui.window.Window(
+    Window(
         onCloseRequest = ::exitApplication,
         title = "Architecture Visualization"
     ) {

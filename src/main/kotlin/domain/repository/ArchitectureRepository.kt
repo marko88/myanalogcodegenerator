@@ -6,14 +6,17 @@ import domain.model.NodeDependency
 import domain.repository.ArchitectureDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class ArchitectureRepository {
     private val _model = MutableStateFlow(ArchitectureDatabase())
-    val model: StateFlow<ArchitectureDatabase> = _model.asStateFlow()
+    val model: StateFlow<ArchitectureDatabase> = _model
 
     fun addNode(node: ArchitectureNode) {
         _model.value = _model.value.addNode(node)
+    }
+
+    fun updateModel(newModel: ArchitectureDatabase) {
+        _model.value = newModel
     }
 
     fun addDependency(sourceId: String, dependency: NodeDependency) {

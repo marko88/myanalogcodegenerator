@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -25,7 +27,7 @@ fun NodeBox(
     selectionState: NodeSelectionState = NodeSelectionState.DEFAULT,
     showDetails: Boolean = true,
     modifier: Modifier = Modifier,
-    boxWidth: Dp = 160.dp,
+    boxWidth: Dp = 200.dp,
     borderWidth: Dp = 1.dp,
     cornerRadius: Dp = 6.dp,
     onHeightMeasured: (Int) -> Unit = {}
@@ -56,24 +58,25 @@ fun NodeBox(
             Text(
                 text = node.name,
                 color = labelTextColor,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Medium,
                 fontSize = 10.sp,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.height(30.dp)
             )
         }
 
         if (showDetails) {
             Column(
                 modifier = Modifier
+                    .wrapContentSize(Alignment.Center)
                     .align(Alignment.TopStart)
                     .padding(top = 28.dp, start = 8.dp, end = 8.dp, bottom = 8.dp)
                     .fillMaxWidth()
             ) {
                 node.attributes.forEach {
                     NodeAttributeView(it, selectionState = NodeSelectionState.DEFAULT) // Placeholder
-                }
-                if (node.attributes.isNotEmpty() && node.methods.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
                 }
                 node.methods.forEach {
                     NodeMethodView(it, selectionState = NodeSelectionState.DEFAULT) // Placeholder

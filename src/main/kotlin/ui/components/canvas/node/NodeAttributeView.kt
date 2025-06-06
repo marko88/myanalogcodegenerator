@@ -2,6 +2,7 @@ package myanalogcodegenerator.ui.components.canvas.node
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
@@ -10,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,7 +35,7 @@ fun NodeAttributeView(
             .padding(vertical = 2.dp)
     ) {
         // Left pin (for connecting lines)
-        NodePinView(color = style.textColor)
+        NodePinView(color = style.textColor, modifier = Modifier.align(Alignment.CenterVertically))
 
         Spacer(modifier = Modifier.width(6.dp))
 
@@ -42,7 +44,8 @@ fun NodeAttributeView(
             fontSize = 10.sp,
             color = style.textColor,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.height(30.dp).align(Alignment.CenterVertically)
         )
     }
 }

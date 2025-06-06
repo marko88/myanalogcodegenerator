@@ -1,9 +1,12 @@
 package myanalogcodegenerator.ui.components.canvas.node
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -15,18 +18,28 @@ import ui.components.canvas.NodeSelectionState
 @Composable
 fun NodeMethodView(
     method: NodeMethod,
-    selectionState: NodeSelectionState = NodeSelectionState.DEFAULT
+    selectionState: NodeSelectionState = NodeSelectionState.DEFAULT,
+    onPinPositioned: ((String, Offset) -> Unit)? = null
 ) {
-    val style = NodeItemStyles.methodStyle(selectionState == NodeSelectionState.SELECTED)
+    val style = NodeItemStyles.fromSelection(selectionState)
 
-    Text(
-        text = method.name,
-        color = style.textColor,
-        fontSize = 9.sp,
-        fontWeight = FontWeight.Medium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = Modifier
-            .padding(bottom = 1.dp)
-    )
+    Row {
+        NodePinView(
+            color = style.textColor,
+            modifier = Modifier.alignByBaseline()
+        )
+
+        Spacer(modifier = Modifier.width(6.dp))
+
+        Text(
+            text = method.name,
+            fontSize = 10.sp,
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Medium,
+            color = style.textColor,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.alignByBaseline()
+        )
+    }
 }

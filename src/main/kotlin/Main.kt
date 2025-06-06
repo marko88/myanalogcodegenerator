@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Window
@@ -16,8 +15,6 @@ import ui.components.canvas.CanvasView
 
 @Composable
 fun App(architectureRepository: ArchitectureRepository) {
-    val architecture = architectureRepository.model.collectAsState().value
-
     MaterialTheme {
         Box(
             modifier = Modifier

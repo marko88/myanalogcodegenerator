@@ -1,10 +1,16 @@
 package myanalogcodegenerator.ui.components.canvas.node
 
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -15,17 +21,28 @@ import ui.components.canvas.NodeSelectionState
 @Composable
 fun NodeAttributeView(
     attribute: NodeAttribute,
-    selectionState: NodeSelectionState = NodeSelectionState.DEFAULT
+    selectionState: NodeSelectionState = NodeSelectionState.DEFAULT,
+    onPinPositioned: ((String, Offset) -> Unit)? = null
 ) {
-    val style = NodeItemStyles.methodStyle(selectionState == NodeSelectionState.SELECTED)
+    val style = NodeItemStyles.fromSelection(selectionState)
 
-    Text(
-        text = attribute.name,
-        color = style.textColor,
-        fontSize = 9.sp,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(bottom = 1.dp)
-    )
+            .fillMaxWidth()
+            .padding(vertical = 2.dp)
+    ) {
+        // Left pin (for connecting lines)
+        NodePinView(color = style.textColor)
+
+        Spacer(modifier = Modifier.width(6.dp))
+
+        Text(
+            text = "${attribute.name}: ${attribute.type}",
+            fontSize = 10.sp,
+            color = style.textColor,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
 }

@@ -1,6 +1,5 @@
 package myanalogcodegenerator.domain.model
 
-import androidx.compose.ui.geometry.Offset
 import domain.model.*
 import domain.repository.ArchitectureDatabase
 
@@ -12,7 +11,9 @@ object DemoData {
             name = "LibraryPresenter",
             layer = ArchitectureLayer.PRESENTATION,
             type = ArchitectureNodeType.PRESENTER,
-            methods = listOf(NodeMethod("renderLibrary", "Unit", semantics = DataFlowSemantics.Event))
+            methods = listOf(
+                NodeMethod("renderLibrary", "Unit", semantics = DataFlowSemantics.Event)
+            )
         )
 
         val presenter2 = ArchitectureNode(
@@ -20,7 +21,9 @@ object DemoData {
             name = "AccountPresenter",
             layer = ArchitectureLayer.PRESENTATION,
             type = ArchitectureNodeType.PRESENTER,
-            methods = listOf(NodeMethod("renderUser", "Unit", semantics = DataFlowSemantics.Event))
+            methods = listOf(
+                NodeMethod("renderUser", "Unit", semantics = DataFlowSemantics.Event)
+            )
         )
 
         val view1 = ArchitectureNode(
@@ -28,8 +31,12 @@ object DemoData {
             name = "LibraryScreen",
             layer = ArchitectureLayer.PRESENTATION,
             type = ArchitectureNodeType.VIEW,
-            methods = listOf(NodeMethod("onBookClick", "Unit", listOf("bookId" to "String"), semantics = DataFlowSemantics.Event)),
-            attributes = listOf(NodeAttribute("books", "List<Book>", isReactive = true, semantics = DataFlowSemantics.State))
+            methods = listOf(
+                NodeMethod("onBookClick", "Unit", listOf("bookId" to "String"), semantics = DataFlowSemantics.Event)
+            ),
+            attributes = listOf(
+                NodeAttribute("books", "List<Book>", isReactive = true, semantics = DataFlowSemantics.State)
+            )
         )
 
         val view2 = ArchitectureNode(
@@ -37,8 +44,12 @@ object DemoData {
             name = "AccountScreen",
             layer = ArchitectureLayer.PRESENTATION,
             type = ArchitectureNodeType.VIEW,
-            methods = listOf(NodeMethod("onLogout", "Unit", semantics = DataFlowSemantics.Command)),
-            attributes = listOf(NodeAttribute("userName", "String", isReactive = true, semantics = DataFlowSemantics.State))
+            methods = listOf(
+                NodeMethod("onLogout", "Unit", semantics = DataFlowSemantics.Command)
+            ),
+            attributes = listOf(
+                NodeAttribute("userName", "String", isReactive = true, semantics = DataFlowSemantics.State)
+            )
         )
 
         val viewModel1 = ArchitectureNode(
@@ -74,7 +85,9 @@ object DemoData {
             name = "GetBooksUseCase",
             layer = ArchitectureLayer.DOMAIN,
             type = ArchitectureNodeType.USE_CASE,
-            methods = listOf(NodeMethod("execute", "Flow<List<Book>>", semantics = DataFlowSemantics.Response))
+            methods = listOf(
+                NodeMethod("execute", "Flow<List<Book>>", semantics = DataFlowSemantics.Response)
+            )
         )
 
         val useCase2 = ArchitectureNode(
@@ -82,7 +95,9 @@ object DemoData {
             name = "GetUserUseCase",
             layer = ArchitectureLayer.DOMAIN,
             type = ArchitectureNodeType.USE_CASE,
-            methods = listOf(NodeMethod("execute", "Flow<User>", semantics = DataFlowSemantics.Response))
+            methods = listOf(
+                NodeMethod("execute", "Flow<User>", semantics = DataFlowSemantics.Response)
+            )
         )
 
         val repository1 = ArchitectureNode(
@@ -90,7 +105,9 @@ object DemoData {
             name = "BookRepository",
             layer = ArchitectureLayer.DATA,
             type = ArchitectureNodeType.REPOSITORY,
-            methods = listOf(NodeMethod("getAllBooks", "Flow<List<Book>>", semantics = DataFlowSemantics.Response))
+            methods = listOf(
+                NodeMethod("getAllBooks", "Flow<List<Book>>", semantics = DataFlowSemantics.Response)
+            )
         )
 
         val repository2 = ArchitectureNode(
@@ -98,7 +115,9 @@ object DemoData {
             name = "UserRepository",
             layer = ArchitectureLayer.DATA,
             type = ArchitectureNodeType.REPOSITORY,
-            methods = listOf(NodeMethod("getUser", "Flow<User>", semantics = DataFlowSemantics.Response))
+            methods = listOf(
+                NodeMethod("getUser", "Flow<User>", semantics = DataFlowSemantics.Response)
+            )
         )
 
         val database = ArchitectureNode(
@@ -106,7 +125,42 @@ object DemoData {
             name = "AppDatabase",
             layer = ArchitectureLayer.DATA,
             type = ArchitectureNodeType.DATABASE,
-            attributes = listOf(NodeAttribute("books", "List<Book>", isReactive = true, semantics = DataFlowSemantics.State))
+            attributes = listOf(
+                NodeAttribute("books", "List<Book>", isReactive = true, semantics = DataFlowSemantics.State)
+            )
+        )
+
+        // Define data flow connections
+        val dataFlow1 = DataFlowConnection(
+            fromNodeId = "viewModel1",
+            fromSymbol = "books",
+            toNodeId = "view1",
+            toSymbol = "books",
+            semantics = DataFlowSemantics.State
+        )
+
+        val dataFlow2 = DataFlowConnection(
+            fromNodeId = "viewModel2",
+            fromSymbol = "user",
+            toNodeId = "view2",
+            toSymbol = "userName",
+            semantics = DataFlowSemantics.State
+        )
+
+        val dataFlow3 = DataFlowConnection(
+            fromNodeId = "useCase1",
+            fromSymbol = "execute",
+            toNodeId = "viewModel1",
+            toSymbol = "loadBooks",
+            semantics = DataFlowSemantics.Response
+        )
+
+        val dataFlow4 = DataFlowConnection(
+            fromNodeId = "view1",
+            fromSymbol = "onBookClick",
+            toNodeId = "viewModel1",
+            toSymbol = "loadBooks",
+            semantics = DataFlowSemantics.Command
         )
 
         return ArchitectureDatabase()
@@ -121,5 +175,9 @@ object DemoData {
             .addNode(repository1.copy(dependencies = listOf(NodeDependency("db1", DependencyType.CONSTRUCTOR_INJECTION))))
             .addNode(repository2.copy(dependencies = listOf(NodeDependency("db1", DependencyType.CONSTRUCTOR_INJECTION))))
             .addNode(database)
+            .addDataFlow(dataFlow1)
+            .addDataFlow(dataFlow2)
+            .addDataFlow(dataFlow3)
+            .addDataFlow(dataFlow4)
     }
 }

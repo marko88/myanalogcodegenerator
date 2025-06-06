@@ -91,3 +91,8 @@ data class DependencyChain(
     val types: List<DependencyType>,   // Types of dependencies between nodes
     val description: String = "",       // Description of what this chain represents
 )
+
+fun NodeMethod.signature(): String {
+    val params = parameters.joinToString(", ") { "${it.first}: ${it.second}" }
+    return "$name($params): $returnType"
+}

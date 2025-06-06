@@ -21,7 +21,7 @@ fun LayeredNodeLayout(nodes: List<ArchitectureNode>) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        ArchitectureLayer.values().forEach { layer ->
+        ArchitectureLayer.entries.forEach { layer ->
             val nodesInLayer = nodes.filter { it.layer == layer }
             val nodesByType = nodesInLayer.groupBy { it.type }
 

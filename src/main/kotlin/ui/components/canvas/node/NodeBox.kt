@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import domain.model.ArchitectureNode
 import ui.components.canvas.NodeSelectionState
-import ui.components.canvas.node.NodeBoxStyles
+import myanalogcodegenerator.ui.components.canvas.node.style.NodeBoxStyles
 
 @Composable
 fun NodeBox(
@@ -33,7 +33,10 @@ fun NodeBox(
     cornerRadius: Dp = 6.dp,
     onHeightMeasured: (Int) -> Unit = {}
 ) {
-    val style = NodeBoxStyles.fromSelection(selectionState == NodeSelectionState.SELECTED)
+    val style = NodeBoxStyles.fromSelection(selectionState)
+
+    val labelColor = NodeBoxStyles.labelColorForLayer(node.layer)
+    val labelTextColor = NodeBoxStyles.labelTextColorForLayer(node.layer)
 
     Box(
         modifier = modifier
@@ -48,18 +51,15 @@ fun NodeBox(
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(start = 4.dp, top = 4.dp)
-                .height(18.dp)
-                .background(style.labelColor, shape = RoundedCornerShape(6.dp))
+                .wrapContentHeight()
+                .background(labelColor, shape = RoundedCornerShape(6.dp))
                 .padding(horizontal = 6.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = node.name,
-                color = Color.Black,
-                textAlign = TextAlign.Center,
+                color = labelTextColor,
                 fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

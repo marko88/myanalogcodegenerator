@@ -1,18 +1,11 @@
 package myanalogcodegenerator.ui.components.canvas.node
 
-
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,7 +17,7 @@ import ui.components.canvas.NodeSelectionState
 fun NodeAttributeView(
     attribute: NodeAttribute,
     selectionState: NodeSelectionState = NodeSelectionState.DEFAULT,
-    onPinPositioned: ((String, Offset) -> Unit)? = null
+    onClick: () -> Unit
 ) {
     val style = NodeItemStyles.fromSelection(selectionState)
 
@@ -33,6 +26,7 @@ fun NodeAttributeView(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 2.dp)
+            .clickable { onClick() }
     ) {
         // Left pin (for connecting lines)
         NodePinView(color = style.textColor, modifier = Modifier.align(Alignment.CenterVertically))

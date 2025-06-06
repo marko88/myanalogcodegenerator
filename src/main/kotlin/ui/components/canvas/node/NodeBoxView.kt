@@ -2,6 +2,7 @@ package myanalogcodegenerator.ui.components.canvas.node
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import domain.model.ArchitectureNode
+import myanalogcodegenerator.ui.components.canvas.SelectableEntity
 import ui.components.canvas.NodeSelectionState
 import myanalogcodegenerator.ui.components.canvas.node.style.NodeBoxStyles
 
@@ -30,7 +32,8 @@ fun NodeBox(
     boxWidth: Dp = 200.dp,
     borderWidth: Dp = 1.dp,
     cornerRadius: Dp = 6.dp,
-    onHeightMeasured: (Int) -> Unit = {}
+    onHeightMeasured: (Int) -> Unit = {},
+    onClick: (SelectableEntity) -> Unit
 ) {
     val style = NodeBoxStyles.fromSelection(selectionState)
 
@@ -52,7 +55,8 @@ fun NodeBox(
                 .align(Alignment.TopStart)
                 .wrapContentHeight()
                 .background(labelColor, shape = RoundedCornerShape(6.dp))
-                .padding(horizontal = 6.dp),
+                .padding(horizontal = 6.dp)
+                .clickable { onClick(SelectableEntity.Node(nodeId = node.id)) },
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -75,11 +79,19 @@ fun NodeBox(
                     .padding(top = 28.dp, start = 8.dp, end = 8.dp, bottom = 8.dp)
                     .fillMaxWidth()
             ) {
-                node.attributes.forEach {
-                    NodeAttributeView(it, selectionState = NodeSelectionState.DEFAULT) // Placeholder
+                node.attributes.forEach { attribute ->
+                    NodeAttributeView(
+                        attribute,
+                        selectionState = NodeSelectionState.DEFAULT,
+                        onClick = { onClick(SelectableEntity.Attribute(node.id, attribute)) }
+                    ) // Placeholder
                 }
-                node.methods.forEach {
-                    NodeMethodView(it, selectionState = NodeSelectionState.DEFAULT) // Placeholder
+                node.methods.forEach { method ->
+                    NodeMethodView(
+                        method,
+                        selectionState = NodeSelectionState.DEFAULT,
+                        onClick = { onClick(SelectableEntity.Method(node.id, method = method)) }
+                    )
                 }
             }
         }

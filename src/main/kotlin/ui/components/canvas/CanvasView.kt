@@ -17,6 +17,8 @@ fun CanvasView(architectureRepository: ArchitectureRepository) {
     val architecture by architectureRepository.model.collectAsState()
     val nodes = architecture.getAllNodes().toList()
 
+    val selection by architectureRepository.selection.collectAsState() // 👈 observe selection
+
     var scale by remember { mutableStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
 
@@ -37,7 +39,13 @@ fun CanvasView(architectureRepository: ArchitectureRepository) {
             )
             .background(color = androidx.compose.ui.graphics.Color(0xFF1A1B26))
     ) {
-        LayeredNodeLayout(nodes = nodes)
+        LayeredNodeLayout(
+            nodes = nodes,
+            selection = selection, // 👈 pass current selection state
+            onClick = { selectableEntity ->
+                architectureRepository.toggleSelection(selectableEntity)
+            }
+        )
     }
 }
 

@@ -9,9 +9,14 @@ import androidx.compose.ui.unit.dp
 import domain.model.ArchitectureLayer
 import domain.model.ArchitectureNode
 import myanalogcodegenerator.ui.components.canvas.node.NodeBox
+import ui.components.canvas.NodeSelectionState
 
 @Composable
-fun LayeredNodeLayout(nodes: List<ArchitectureNode>) {
+fun LayeredNodeLayout(
+    nodes: List<ArchitectureNode>,
+    selection: Set<SelectableEntity>, // 👈 add this parameter
+    onClick: (SelectableEntity) -> Unit
+) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -29,7 +34,15 @@ fun LayeredNodeLayout(nodes: List<ArchitectureNode>) {
                 Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                     groupedNodes.forEach { node ->
                         NodeBox(
-                            node = node
+                            node = node,
+                            selectionState = if (selection.contains(SelectableEntity.Node(node.id))) {
+                                NodeSelectionState.SELECTED
+                            } else {
+                                NodeSelectionState.DEFAULT
+                            },
+                            onClick = { selectableEntity ->
+                                onClick(selectableEntity)
+                            }
                         )
                     }
                 }

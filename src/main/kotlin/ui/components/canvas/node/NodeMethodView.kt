@@ -39,8 +39,15 @@ fun NodeMethodView(
 
         Spacer(modifier = Modifier.width(6.dp))
 
+        val signature = if (method.parameters.isNotEmpty()) {
+            val params = method.parameters.joinToString(", ") { (name, type) -> "$name: $type" }
+            "${method.name}($params): ${method.returnType}"
+        } else {
+            "${method.name}(): ${method.returnType}"
+        }
+
         Text(
-            text = method.name,
+            text = signature,
             fontSize = 10.sp,
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Medium,

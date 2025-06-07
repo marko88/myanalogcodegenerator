@@ -3,7 +3,7 @@ package domain.model
 import androidx.compose.ui.geometry.Offset
 
 enum class ArchitectureNodeType {
-    VIEW, VIEWMODEL, PRESENTER, USE_CASE, REPOSITORY, DATABASE, OTHER
+    VIEW, VIEWMODEL, PRESENTER, USE_CASE, REPOSITORY, DATABASE, OTHER, API
 }
 
 data class ArchitectureNode(

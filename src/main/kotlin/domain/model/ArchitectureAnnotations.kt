@@ -51,5 +51,6 @@ enum class DependencyType {
     // More specific for generation/visual clarity
     CONSTRUCTOR_INJECTION,   // Injected via constructor (e.g., Dagger/Hilt/Koin)
     FIELD_INJECTION,         // Injected via property/field
-    METHOD_INJECTION         // Injected via method or setter
+    METHOD_INJECTION,         // Injected via method or setter
+    NETWORK_CALL
 } 

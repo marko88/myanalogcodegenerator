@@ -21,6 +21,10 @@ fun NodeAttributeView(
 ) {
     val style = NodeItemStyles.fromSelection(selectionState)
 
+    if (selectionState != NodeSelectionState.DEFAULT) {
+        println()
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -31,6 +35,10 @@ fun NodeAttributeView(
         // Left pin (for connecting lines)
         NodePinView(color = style.textColor, modifier = Modifier.align(Alignment.CenterVertically))
 
+        if (selectionState == NodeSelectionState.HIGHLIGHTED || selectionState == NodeSelectionState.SELECTED) {
+            println()
+        }
+
         Spacer(modifier = Modifier.width(6.dp))
 
         Text(
@@ -39,7 +47,9 @@ fun NodeAttributeView(
             color = style.textColor,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.height(30.dp).align(Alignment.CenterVertically)
+            modifier = Modifier.height(30.dp).align(Alignment.CenterVertically).clickable {
+                onClick()
+            }
         )
     }
 }

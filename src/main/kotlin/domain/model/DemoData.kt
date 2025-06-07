@@ -80,7 +80,7 @@ object DemoData {
 
         // Presenters
         val splashPresenter = ArchitectureNode(
-            id = "presenter1",
+            id = "SplashPresenter",
             name = "SplashPresenter",
             layer = ArchitectureLayer.PRESENTATION,
             type = ArchitectureNodeType.PRESENTER,
@@ -230,73 +230,153 @@ object DemoData {
         )
 
         return ArchitectureDatabase()
-            .addNode(splashScreen)
-            .addNode(createUserScreen)
-            .addNode(loginScreen)
-            .addNode(collectionScreen)
-            .addNode(vinylDetailsScreen)
-            .addNode(userDetailsScreen)
+            // Views
+            .addNode(
+                splashScreen.copy(
+                    dependencies = listOf(
+                        NodeDependency(
+                            "SplashPresenter",
+                            DependencyType.OBSERVES
+                        )
+                    )
+                )
+            )
+            .addNode(
+                createUserScreen.copy(
+                    dependencies = listOf(
+                        NodeDependency(
+                            "presenter2",
+                            DependencyType.OBSERVES
+                        )
+                    )
+                )
+            )
+            .addNode(loginScreen.copy(dependencies = listOf(NodeDependency("presenter3", DependencyType.OBSERVES))))
+            .addNode(
+                collectionScreen.copy(
+                    dependencies = listOf(
+                        NodeDependency(
+                            "presenter4",
+                            DependencyType.OBSERVES
+                        )
+                    )
+                )
+            )
+            .addNode(
+                vinylDetailsScreen.copy(
+                    dependencies = listOf(
+                        NodeDependency(
+                            "presenter5",
+                            DependencyType.OBSERVES
+                        )
+                    )
+                )
+            )
+            .addNode(
+                userDetailsScreen.copy(
+                    dependencies = listOf(
+                        NodeDependency(
+                            "presenter6",
+                            DependencyType.OBSERVES
+                        )
+                    )
+                )
+            )
 
-            .addNode(splashPresenter)
-            .addNode(createUserPresenter)
-            .addNode(loginPresenter)
-            .addNode(collectionPresenter)
-            .addNode(vinylDetailsPresenter)
-            .addNode(userDetailsPresenter)
+            // Presenters
+            .addNode(
+                splashPresenter.copy(
+                    dependencies = listOf(
+                        NodeDependency(
+                            "vm1",
+                            DependencyType.CONSTRUCTOR_INJECTION
+                        )
+                    )
+                )
+            )
+            .addNode(
+                createUserPresenter.copy(
+                    dependencies = listOf(
+                        NodeDependency(
+                            "vm1",
+                            DependencyType.CONSTRUCTOR_INJECTION
+                        )
+                    )
+                )
+            )
+            .addNode(
+                loginPresenter.copy(
+                    dependencies = listOf(
+                        NodeDependency(
+                            "vm2",
+                            DependencyType.CONSTRUCTOR_INJECTION
+                        )
+                    )
+                )
+            )
+            .addNode(
+                collectionPresenter.copy(
+                    dependencies = listOf(
+                        NodeDependency(
+                            "vm3",
+                            DependencyType.CONSTRUCTOR_INJECTION
+                        )
+                    )
+                )
+            )
+            .addNode(
+                vinylDetailsPresenter.copy(
+                    dependencies = listOf(
+                        NodeDependency(
+                            "vm4",
+                            DependencyType.CONSTRUCTOR_INJECTION
+                        )
+                    )
+                )
+            )
+            .addNode(userDetailsPresenter) // No ViewModel for user details yet
 
-            .addNode(createUserViewModel)
+            // ViewModels
+            .addNode(createUserViewModel) // No use case dependency defined
             .addNode(
                 loginViewModel.copy(
                     dependencies = listOf(
-                        NodeDependency(
-                            "repo1",
-                            DependencyType.CONSTRUCTOR_INJECTION
-                        )
+                        NodeDependency("repo1", DependencyType.CONSTRUCTOR_INJECTION)
                     )
                 )
             )
             .addNode(
                 collectionViewModel.copy(
                     dependencies = listOf(
-                        NodeDependency(
-                            "uc1",
-                            DependencyType.CONSTRUCTOR_INJECTION
-                        )
+                        NodeDependency("uc1", DependencyType.CONSTRUCTOR_INJECTION)
                     )
                 )
             )
             .addNode(
                 vinylDetailsViewModel.copy(
                     dependencies = listOf(
-                        NodeDependency(
-                            "uc2",
-                            DependencyType.CONSTRUCTOR_INJECTION
-                        )
+                        NodeDependency("uc2", DependencyType.CONSTRUCTOR_INJECTION)
                     )
                 )
             )
 
+            // Use Cases
             .addNode(
                 getCollectionUseCase.copy(
                     dependencies = listOf(
-                        NodeDependency(
-                            "repo2",
-                            DependencyType.CONSTRUCTOR_INJECTION
-                        )
+                        NodeDependency("repo2", DependencyType.CONSTRUCTOR_INJECTION)
                     )
                 )
             )
             .addNode(
                 getVinylDetailsUseCase.copy(
                     dependencies = listOf(
-                        NodeDependency(
-                            "repo2",
-                            DependencyType.CONSTRUCTOR_INJECTION
-                        )
+                        NodeDependency("repo2", DependencyType.CONSTRUCTOR_INJECTION)
                     )
                 )
             )
 
+            // Repositories
             .addNode(userRepository)
             .addNode(
                 vinylRepository.copy(
@@ -307,8 +387,81 @@ object DemoData {
                 )
             )
 
+            // APIs
             .addNode(discogsService)
             .addNode(junoService)
+            .addDataFlow(
+                DataFlowConnection(
+                    fromNodeId = "vm2",
+                    fromSymbol = "login",
+                    toNodeId = "view3",
+                    toSymbol = "user",
+                    semantics = DataFlowSemantics.Response
+                )
+            )
+            .addDataFlow(
+                DataFlowConnection(
+                    fromNodeId = "vm3",
+                    fromSymbol = "collection",
+                    toNodeId = "view4",
+                    toSymbol = "collection",
+                    semantics = DataFlowSemantics.State
+                )
+            )
+            .addDataFlow(
+                DataFlowConnection(
+                    fromNodeId = "vm4",
+                    fromSymbol = "vinyl",
+                    toNodeId = "view5",
+                    toSymbol = "vinyl",
+                    semantics = DataFlowSemantics.State
+                )
+            )
+            .addDataFlow(
+                DataFlowConnection(
+                    fromNodeId = "view2",
+                    fromSymbol = "onCreateClick",
+                    toNodeId = "vm1",
+                    toSymbol = "createUser",
+                    semantics = DataFlowSemantics.Command
+                )
+            )
+            .addDataFlow(
+                DataFlowConnection(
+                    fromNodeId = "view3",
+                    fromSymbol = "onLoginClick",
+                    toNodeId = "vm2",
+                    toSymbol = "login",
+                    semantics = DataFlowSemantics.Command
+                )
+            )
+            .addDataFlow(
+                DataFlowConnection(
+                    fromNodeId = "view4",
+                    fromSymbol = "onVinylSelected",
+                    toNodeId = "vm4",
+                    toSymbol = "loadVinylDetails",
+                    semantics = DataFlowSemantics.Command
+                )
+            )
+            .addDataFlow(
+                DataFlowConnection(
+                    fromNodeId = "uc1",
+                    fromSymbol = "execute",
+                    toNodeId = "vm3",
+                    toSymbol = "loadCollection",
+                    semantics = DataFlowSemantics.Response
+                )
+            )
+            .addDataFlow(
+                DataFlowConnection(
+                    fromNodeId = "uc2",
+                    fromSymbol = "execute",
+                    toNodeId = "vm4",
+                    toSymbol = "loadVinylDetails",
+                    semantics = DataFlowSemantics.Response
+                )
+            )
     }
 }
 

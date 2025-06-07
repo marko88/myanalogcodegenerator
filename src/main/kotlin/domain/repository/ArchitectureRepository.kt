@@ -2,11 +2,13 @@ package myanalogcodegenerator.domain.repository
 
 import domain.model.ArchitectureLayer
 import domain.model.ArchitectureNode
+import domain.model.DataFlowConnection
 import domain.model.NodeDependency
 import domain.repository.ArchitectureDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import myanalogcodegenerator.ui.components.canvas.SelectableEntity
+import ui.components.canvas.NodeSelectionState
 
 class ArchitectureRepository {
     private val _model = MutableStateFlow(ArchitectureDatabase())
@@ -23,6 +25,31 @@ class ArchitectureRepository {
         _model.value = newModel
     }
 
+    fun getRelatedNodeIds(nodeId: String): Set<String> {
+        val related = mutableSetOf<String>()
+
+        // 1. Find all nodes this node depends on (outgoing dependencies)
+        val node = getNodeById(nodeId)
+        node?.dependencies?.forEach { dep ->
+            related.add(dep.targetId)
+        }
+
+        // 2. Find all nodes that depend on this node (incoming dependencies)
+        getAllNodes().forEach { other ->
+            if (other.dependencies.any { it.targetId == nodeId }) {
+                related.add(other.id)
+            }
+        }
+
+        // 3. Include data flow relations
+        getDataFlow().forEach { flow ->
+            if (flow.fromNodeId == nodeId) related.add(flow.toNodeId)
+            if (flow.toNodeId == nodeId) related.add(flow.fromNodeId)
+        }
+
+        return related
+    }
+
     fun addDependency(sourceId: String, dependency: NodeDependency) {
         val sourceNode = getNodeById(sourceId)
         if (sourceNode != null) {
@@ -35,6 +62,70 @@ class ArchitectureRepository {
 
     fun getNodeById(id: String): ArchitectureNode? {
         return _model.value.getNodeById(id)
+    }
+
+    fun getNodeSelectionState(entity: SelectableEntity): NodeSelectionState {
+        if (selection.value.isEmpty()) return NodeSelectionState.DEFAULT
+
+        val selectedNodes = selection.value.filterIsInstance<SelectableEntity.Node>().map { it.nodeId }.toSet()
+        val selectedAttributes = selection.value.filterIsInstance<SelectableEntity.Attribute>()
+        val selectedMethods = selection.value.filterIsInstance<SelectableEntity.Method>()
+
+        val parentSelectedNodes = (selectedMethods.map { it.nodeId } + selectedAttributes.map { it.nodeId }).distinct()
+
+        val nodeRelatedIds = selectedNodes.flatMap { getRelatedNodeIds(it) }.toSet()
+        val itemRelatedIds = selection.value
+            .filter { it is SelectableEntity.Method || it is SelectableEntity.Attribute }
+            .flatMap { getRelatedNodeIds(it.nodeId) }
+            .toSet()
+
+        return when (entity) {
+            is SelectableEntity.Node -> {
+                when {
+                    selectedNodes.contains(entity.nodeId) || parentSelectedNodes.contains(entity.nodeId) -> NodeSelectionState.SELECTED
+                    nodeRelatedIds.contains(entity.nodeId) || itemRelatedIds.contains(entity.nodeId) -> NodeSelectionState.HIGHLIGHTED
+                    else -> NodeSelectionState.DISABLED
+                }
+            }
+
+            is SelectableEntity.Method -> {
+                val isParentSelected = selectedNodes.contains(entity.nodeId)
+                val isSelfSelected = selectedMethods.any { it.nodeId == entity.nodeId && it.method == entity.method }
+                val isParentRelated = nodeRelatedIds.contains(entity.nodeId)
+                val isItemRelated = selection.value.any {
+                    (it is SelectableEntity.Method || it is SelectableEntity.Attribute) &&
+                            getRelatedNodeIds(it.nodeId).contains(entity.nodeId)
+                }
+
+                when {
+                    isParentSelected || isSelfSelected -> NodeSelectionState.SELECTED
+                    isParentRelated || isItemRelated -> NodeSelectionState.HIGHLIGHTED
+                    else -> NodeSelectionState.DISABLED
+                }
+            }
+
+            is SelectableEntity.Attribute -> {
+                val isParentSelected = selectedNodes.contains(entity.nodeId)
+                val isSelfSelected = selectedAttributes.any { it.nodeId == entity.nodeId && it.attribute == entity.attribute }
+                val isParentRelated = nodeRelatedIds.contains(entity.nodeId)
+                val isItemRelated = selection.value.any {
+                    (it is SelectableEntity.Method || it is SelectableEntity.Attribute) &&
+                            getRelatedNodeIds(it.nodeId).contains(entity.nodeId)
+                }
+
+                when {
+                    isParentSelected || isSelfSelected -> NodeSelectionState.SELECTED
+                    isParentRelated || isItemRelated -> NodeSelectionState.HIGHLIGHTED
+                    else -> NodeSelectionState.DISABLED
+                }
+            }
+        }
+    }
+
+
+
+    fun getDataFlow(): List<DataFlowConnection> {
+        return _model.value.dataFlows
     }
 
     fun getAllNodes(): List<ArchitectureNode> {

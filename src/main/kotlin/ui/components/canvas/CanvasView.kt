@@ -1,9 +1,11 @@
 package ui.components.canvas
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.onClick
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -25,6 +27,9 @@ fun CanvasView(architectureRepository: ArchitectureRepository) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .clickable {
+                architectureRepository.clearSelection()
+            }
             .pointerInput(Unit) {
                 detectTransformGestures { _, pan, zoom, _ ->
                     scale *= zoom
@@ -40,6 +45,7 @@ fun CanvasView(architectureRepository: ArchitectureRepository) {
             .background(color = androidx.compose.ui.graphics.Color(0xFF1A1B26))
     ) {
         LayeredNodeLayout(
+            architectureRepository,
             nodes = nodes,
             selection = selection, // 👈 pass current selection state
             onClick = { selectableEntity ->

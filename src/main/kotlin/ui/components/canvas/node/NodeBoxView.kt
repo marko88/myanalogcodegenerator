@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import domain.model.ArchitectureNode
+import myanalogcodegenerator.domain.repository.ArchitectureRepository
 import myanalogcodegenerator.ui.components.canvas.SelectableEntity
 import ui.components.canvas.NodeSelectionState
 import myanalogcodegenerator.ui.components.canvas.node.style.NodeBoxStyles
@@ -26,6 +27,7 @@ import myanalogcodegenerator.ui.components.canvas.node.style.NodeBoxStyles
 @Composable
 fun NodeBox(
     node: ArchitectureNode,
+    architectureRepository: ArchitectureRepository,
     selectionState: NodeSelectionState = NodeSelectionState.DEFAULT,
     showDetails: Boolean = true,
     modifier: Modifier = Modifier,
@@ -46,8 +48,8 @@ fun NodeBox(
             .wrapContentHeight()
             .clip(RoundedCornerShape(cornerRadius))
             .background(style.backgroundColor)
-            .border(borderWidth, style.borderColor, RoundedCornerShape(cornerRadius))
             .graphicsLayer { alpha = style.alpha }
+            .border(borderWidth, style.borderColor, RoundedCornerShape(cornerRadius))
             .onGloballyPositioned { coordinates -> onHeightMeasured(coordinates.size.height) }
     ) {
         Box(
@@ -82,14 +84,18 @@ fun NodeBox(
                 node.attributes.forEach { attribute ->
                     NodeAttributeView(
                         attribute,
-                        selectionState = NodeSelectionState.DEFAULT,
+                        selectionState = architectureRepository.getNodeSelectionState(
+                            SelectableEntity.Attribute(node.id, attribute)
+                        ),
                         onClick = { onClick(SelectableEntity.Attribute(node.id, attribute)) }
                     ) // Placeholder
                 }
                 node.methods.forEach { method ->
                     NodeMethodView(
                         method,
-                        selectionState = NodeSelectionState.DEFAULT,
+                        selectionState = architectureRepository.getNodeSelectionState(
+                            SelectableEntity.Method(node.id, method)
+                        ),
                         onClick = { onClick(SelectableEntity.Method(node.id, method = method)) }
                     )
                 }

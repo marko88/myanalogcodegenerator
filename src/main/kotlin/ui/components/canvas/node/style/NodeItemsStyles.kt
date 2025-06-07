@@ -38,7 +38,7 @@ object NodeItemStyles {
 
         NodeSelectionState.SELECTED -> ItemStyle(
             backgroundColor = Color(0xFF342B3D),
-            textColor = Color(0xFFE5FFF9)
+            textColor = Color.Green
         )
 
         NodeSelectionState.HIGHLIGHTED -> ItemStyle(

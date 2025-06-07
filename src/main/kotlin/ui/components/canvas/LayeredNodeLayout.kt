@@ -8,13 +8,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import domain.model.ArchitectureLayer
 import domain.model.ArchitectureNode
+import myanalogcodegenerator.domain.repository.ArchitectureRepository
 import myanalogcodegenerator.ui.components.canvas.node.NodeBox
-import ui.components.canvas.NodeSelectionState
 
 @Composable
 fun LayeredNodeLayout(
-    nodes: List<ArchitectureNode>,
-    selection: Set<SelectableEntity>, // 👈 add this parameter
+    architectureRepository: ArchitectureRepository,
+    nodes: List<ArchitectureNode>, // 👈 add this parameter
+    selection: Set<SelectableEntity>,
     onClick: (SelectableEntity) -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -35,11 +36,10 @@ fun LayeredNodeLayout(
                     groupedNodes.forEach { node ->
                         NodeBox(
                             node = node,
-                            selectionState = if (selection.contains(SelectableEntity.Node(node.id))) {
-                                NodeSelectionState.SELECTED
-                            } else {
-                                NodeSelectionState.DEFAULT
-                            },
+                            architectureRepository = architectureRepository,
+                            selectionState = architectureRepository.getNodeSelectionState(
+                                SelectableEntity.Node(node.id)
+                            ),
                             onClick = { selectableEntity ->
                                 onClick(selectableEntity)
                             }

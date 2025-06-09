@@ -236,7 +236,7 @@ object DemoData {
                     dependencies = listOf(
                         NodeDependency(
                             "SplashPresenter",
-                            DependencyType.OBSERVES
+                            DependencyType.CONSTRUCTOR_INJECTION
                         )
                     )
                 )
@@ -246,18 +246,27 @@ object DemoData {
                     dependencies = listOf(
                         NodeDependency(
                             "presenter2",
-                            DependencyType.OBSERVES
+                            DependencyType.CONSTRUCTOR_INJECTION
                         )
                     )
                 )
             )
-            .addNode(loginScreen.copy(dependencies = listOf(NodeDependency("presenter3", DependencyType.OBSERVES))))
+            .addNode(
+                loginScreen.copy(
+                    dependencies = listOf(
+                        NodeDependency(
+                            "presenter3",
+                            DependencyType.CONSTRUCTOR_INJECTION
+                        )
+                    )
+                )
+            )
             .addNode(
                 collectionScreen.copy(
                     dependencies = listOf(
                         NodeDependency(
                             "presenter4",
-                            DependencyType.OBSERVES
+                            DependencyType.USES
                         )
                     )
                 )
@@ -267,7 +276,7 @@ object DemoData {
                     dependencies = listOf(
                         NodeDependency(
                             "presenter5",
-                            DependencyType.OBSERVES
+                            DependencyType.CONSTRUCTOR_INJECTION
                         )
                     )
                 )
@@ -277,7 +286,7 @@ object DemoData {
                     dependencies = listOf(
                         NodeDependency(
                             "presenter6",
-                            DependencyType.OBSERVES
+                            DependencyType.USES
                         )
                     )
                 )

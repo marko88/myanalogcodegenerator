@@ -35,7 +35,7 @@ fun NodeBox(
     borderWidth: Dp = 1.dp,
     cornerRadius: Dp = 6.dp,
     onHeightMeasured: (Int) -> Unit = {},
-    onClick: (SelectableEntity) -> Unit
+    onClick: (SelectableEntity) -> Unit,
 ) {
     val style = NodeBoxStyles.fromSelection(selectionState)
 
@@ -52,25 +52,44 @@ fun NodeBox(
             .border(borderWidth, style.borderColor, RoundedCornerShape(cornerRadius))
             .onGloballyPositioned { coordinates -> onHeightMeasured(coordinates.size.height) }
     ) {
-        Box(
+        Row(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .wrapContentHeight()
-                .background(labelColor, shape = RoundedCornerShape(6.dp))
-                .padding(horizontal = 6.dp)
-                .clickable { onClick(SelectableEntity.Node(nodeId = node.id)) },
-            contentAlignment = Alignment.Center
+                .wrapContentWidth()
+                .height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = node.name,
-                color = labelTextColor,
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.Medium,
-                fontSize = 10.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.height(30.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .background(labelColor, shape = RoundedCornerShape(6.dp))
+                    .padding(horizontal = 6.dp)
+                    .clickable { onClick(SelectableEntity.Node(nodeId = node.id)) },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = node.name,
+                    color = labelTextColor,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 10.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.height(30.dp)
+                )
+            }
+
+            if (selectionState == NodeSelectionState.HIGHLIGHTED) {
+                Spacer(modifier = Modifier.width(6.dp))
+
+                val dependencyTypes = node.dependencies.map { it.type }.toSet()
+
+                if (dependencyTypes.isNotEmpty()) {
+                    Spacer(Modifier.height(4.dp))
+                    DependencyTypeTagsView(dependencyTypes)
+                }
+            }
         }
 
         if (showDetails) {

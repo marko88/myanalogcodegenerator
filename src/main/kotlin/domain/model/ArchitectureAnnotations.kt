@@ -42,15 +42,14 @@ enum class ArchitectureLayer(
 /**
  * Types of dependencies between components
  */
-enum class DependencyType {
-    INJECTS,       // Component is injected into another
-    IMPLEMENTS,    // Component implements an interface
-    EXTENDS,       // Component extends another class
-    USES,          // Component uses another component
-    OBSERVES,       // Component observes another component (e.g., LiveData, Flow)
+enum class DependencyType(val value: String) {
+    INJECTS("INJ"),       // Component is injected into another
+    IMPLEMENTS("IMPL"),    // Component implements an interface
+    EXTENDS("EXT"),       // Component extends another class
+    USES("USES"),          // Component uses another component
     // More specific for generation/visual clarity
-    CONSTRUCTOR_INJECTION,   // Injected via constructor (e.g., Dagger/Hilt/Koin)
-    FIELD_INJECTION,         // Injected via property/field
-    METHOD_INJECTION,         // Injected via method or setter
-    NETWORK_CALL
-} 
+    CONSTRUCTOR_INJECTION("C_INJ"),   // Injected via constructor (e.g., Dagger/Hilt/Koin)
+    FIELD_INJECTION("F_INJ"),         // Injected via property/field
+    METHOD_INJECTION("M_INJ"),         // Injected via method or setter
+    NETWORK_CALL("N_CALL")
+}

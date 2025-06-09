@@ -6,22 +6,22 @@ import domain.model.NodeMethod
 /**
  * Represents any selectable component in the architecture.
  */
-sealed class SelectableEntity(open val nodeId: String) {
+sealed class SelectableEntity(open val nodeId: String, open val nodeName: String) {
 
     /**
      * A whole node (e.g., a ViewModel, Presenter, etc.)
      */
-    data class Node(override val nodeId: String) : SelectableEntity(nodeId)
+    data class Node(override val nodeId: String) : SelectableEntity(nodeId, "")
 
     /**
      * A method declared on a node.
      */
-    data class Method(override val nodeId: String, val method: NodeMethod) : SelectableEntity(nodeId)
+    data class Method(override val nodeId: String, val method: NodeMethod) : SelectableEntity(nodeId, method.name)
 
     /**
      * An attribute declared on a node.
      */
-    data class Attribute(override val nodeId: String, val attribute: NodeAttribute) : SelectableEntity(nodeId)
+    data class Attribute(override val nodeId: String, val attribute: NodeAttribute) : SelectableEntity(nodeId, attribute.name)
 
     // If needed in future, more types can be added here, like Events, Flows, etc.
 }

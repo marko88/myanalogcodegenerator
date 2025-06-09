@@ -58,14 +58,26 @@ class ArchitectureRepository {
         val selectedEntities = selection.value
         val relevantFlows = getDataFlow().filter { flow ->
             selectedEntities.any {
-                when (it) {
-                    is SelectableEntity.Method -> flow.fromSymbol == it.method.name || flow.toSymbol == it.method.name
-                    is SelectableEntity.Attribute -> flow.fromSymbol == it.attribute.name || flow.toSymbol == it.attribute.name
-                    else -> false
-                }
+                selectedEntities.any { flow.matchesEntity(it) }
             }
         }
         _activeDataFlows.value = relevantFlows
+    }
+
+    private fun DataFlowConnection.matchesEntity(entity: SelectableEntity): Boolean {
+        return when (entity) {
+            is SelectableEntity.Method -> {
+                (fromNodeId == entity.nodeId && fromSymbol == entity.method.name) ||
+                        (toNodeId == entity.nodeId && toSymbol == entity.method.name)
+            }
+
+            is SelectableEntity.Attribute -> {
+                (fromNodeId == entity.nodeId && fromSymbol == entity.attribute.name) ||
+                        (toNodeId == entity.nodeId && toSymbol == entity.attribute.name)
+            }
+
+            else -> false
+        }
     }
 
 
@@ -121,13 +133,15 @@ class ArchitectureRepository {
                 }
             }
 
-            is SelectableEntity.Method -> {
+            is SelectableEntity.Method, is SelectableEntity.Attribute -> {
                 val isParentSelected = selectedNodes.contains(entity.nodeId)
-                val isSelfSelected = selectedMethods.any { it.nodeId == entity.nodeId && it.method == entity.method }
+                val isSelfSelected = selectedMethods.any { it.nodeId == entity.nodeId && it.name == entity.name }
                 val isParentRelated = nodeRelatedIds.contains(entity.nodeId)
                 val isItemRelated = selection.value.any {
                     (it is SelectableEntity.Method || it is SelectableEntity.Attribute) &&
-                            getRelatedNodeIds(it.nodeId).contains(entity.nodeId)
+                            activeDataFlows.value.any {
+                                it.matchesEntity(entity)
+                            }
                 }
 
                 when {
@@ -137,24 +151,8 @@ class ArchitectureRepository {
                 }
             }
 
-            is SelectableEntity.Attribute -> {
-                val isParentSelected = selectedNodes.contains(entity.nodeId)
-                val isSelfSelected = selectedAttributes.any { it.nodeId == entity.nodeId && it.attribute == entity.attribute }
-                val isParentRelated = nodeRelatedIds.contains(entity.nodeId)
-                val isItemRelated = selection.value.any {
-                    (it is SelectableEntity.Method || it is SelectableEntity.Attribute) &&
-                            getRelatedDataFlows(it.name).contains(entity.nodeId)
-                }
-
-                when {
-                    isParentSelected || isSelfSelected -> NodeSelectionState.SELECTED
-                    isParentRelated || isItemRelated -> NodeSelectionState.HIGHLIGHTED
-                    else -> NodeSelectionState.DISABLED
-                }
-            }
         }
     }
-
 
 
     fun getDataFlow(): List<DataFlowConnection> {

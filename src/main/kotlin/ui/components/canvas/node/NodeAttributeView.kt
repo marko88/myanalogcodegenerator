@@ -23,10 +23,6 @@ fun NodeAttributeView(
 ) {
     val style = NodeItemStyles.fromSelection(selectionState)
 
-    if (selectionState == NodeSelectionState.HIGHLIGHTED) {
-        println()
-    }
-
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier

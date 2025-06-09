@@ -24,7 +24,7 @@ fun DataFlowConnectionView(
     val density = LocalDensity.current
 
     // Pick visual style based on semantics
-    val (lineColor, pathEffect) = when (semantics) {
+    val (_, _) = when (semantics) {
         DataFlowSemantics.Command -> Color.Red to PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
         DataFlowSemantics.Event -> Color.Green to null
         DataFlowSemantics.State -> Color.Blue to PathEffect.dashPathEffect(floatArrayOf(4f, 4f), 0f)
@@ -35,15 +35,26 @@ fun DataFlowConnectionView(
     }
 
     Canvas(modifier = Modifier.fillMaxSize()) {
-        val fromOffset = fromCoord.localToRoot(Offset.Zero)
-        val toOffset = toCoord.localToRoot(Offset.Zero)
+        // Compute the center of the "from" and "to" pins
+        val fromCenter = fromCoord.localToRoot(
+            Offset(
+                x = fromCoord.size.width / 2f,
+                y = fromCoord.size.height / 2f
+            )
+        )
+
+        val toCenter = toCoord.localToRoot(
+            Offset(
+                x = toCoord.size.width / 2f,
+                y = toCoord.size.height / 2f
+            )
+        )
 
         drawLine(
-            color = lineColor,
-            start = fromOffset,
-            end = toOffset,
-            strokeWidth = with(density) { strokeWidth.toPx() },
-            pathEffect = pathEffect
+            color = color,
+            start = fromCenter,
+            end = toCenter,
+            strokeWidth = with(density) { strokeWidth.toPx() }
         )
     }
 }

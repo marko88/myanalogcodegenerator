@@ -31,10 +31,6 @@ fun NodeMethodView(
 ) {
     val style = NodeItemStyles.fromSelection(selectionState)
 
-    if (selectionState == NodeSelectionState.HIGHLIGHTED) {
-        println()
-    }
-
     Row(modifier = Modifier.clickable {
         onClick()
     }) {

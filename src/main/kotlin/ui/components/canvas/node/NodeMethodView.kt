@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import domain.model.ArchitectureNode
 import domain.model.NodeMethod
 import myanalogcodegenerator.ui.components.canvas.node.style.NodeItemStyles
 import ui.components.canvas.NodeSelectionState
@@ -23,13 +24,14 @@ import ui.components.canvas.NodeSelectionState
 @Preview
 @Composable
 fun NodeMethodView(
+    parent: ArchitectureNode,
     method: NodeMethod,
     selectionState: NodeSelectionState = NodeSelectionState.DEFAULT,
     onClick: () -> Unit
 ) {
     val style = NodeItemStyles.fromSelection(selectionState)
 
-    if (selectionState == NodeSelectionState.HIGHLIGHTED || selectionState == NodeSelectionState.SELECTED) {
+    if (selectionState == NodeSelectionState.HIGHLIGHTED) {
         println()
     }
 
@@ -37,7 +39,8 @@ fun NodeMethodView(
         onClick()
     }) {
         NodePinView(
-            color = style.textColor,
+        pinId = "${parent.id}#${method.name}",
+        color = style.textColor,
             modifier = Modifier.align(Alignment.CenterVertically)
         )
 

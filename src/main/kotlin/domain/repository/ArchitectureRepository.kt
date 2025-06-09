@@ -8,6 +8,7 @@ import domain.repository.ArchitectureDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import myanalogcodegenerator.ui.components.canvas.SelectableEntity
+import myanalogcodegenerator.ui.components.canvas.name
 import ui.components.canvas.NodeSelectionState
 
 class ArchitectureRepository {
@@ -16,6 +17,9 @@ class ArchitectureRepository {
 
     private val _selection = MutableStateFlow<Set<SelectableEntity>>(emptySet())
     val selection: StateFlow<Set<SelectableEntity>> = _selection
+
+    private val _activeDataFlows = MutableStateFlow<List<DataFlowConnection>>(emptyList())
+    val activeDataFlows: StateFlow<List<DataFlowConnection>> = _activeDataFlows
 
     fun addNode(node: ArchitectureNode) {
         _model.value = _model.value.addNode(node)
@@ -45,6 +49,35 @@ class ArchitectureRepository {
         getDataFlow().forEach { flow ->
             if (flow.fromNodeId == nodeId) related.add(flow.toNodeId)
             if (flow.toNodeId == nodeId) related.add(flow.fromNodeId)
+        }
+
+        return related
+    }
+
+    fun updateActiveDataFlows() {
+        val selectedEntities = selection.value
+        val relevantFlows = getDataFlow().filter { flow ->
+            selectedEntities.any {
+                when (it) {
+                    is SelectableEntity.Method -> flow.fromSymbol == it.method.name || flow.toSymbol == it.method.name
+                    is SelectableEntity.Attribute -> flow.fromSymbol == it.attribute.name || flow.toSymbol == it.attribute.name
+                    else -> false
+                }
+            }
+        }
+        _activeDataFlows.value = relevantFlows
+    }
+
+
+    fun getRelatedDataFlows(selectableEntity: String?): Set<String> {
+        val related = mutableSetOf<String>()
+
+        selectableEntity?.let { entityName ->
+            // 3. Include data flow relations
+            getDataFlow().forEach { flow ->
+                if (flow.fromNodeId == entityName) related.add(flow.toNodeId)
+                if (flow.toNodeId == entityName) related.add(flow.fromNodeId)
+            }
         }
 
         return related
@@ -110,7 +143,7 @@ class ArchitectureRepository {
                 val isParentRelated = nodeRelatedIds.contains(entity.nodeId)
                 val isItemRelated = selection.value.any {
                     (it is SelectableEntity.Method || it is SelectableEntity.Attribute) &&
-                            getRelatedNodeIds(it.nodeId).contains(entity.nodeId)
+                            getRelatedDataFlows(it.name).contains(entity.nodeId)
                 }
 
                 when {
@@ -148,6 +181,7 @@ class ArchitectureRepository {
         } else {
             _selection.value + entity
         }
+        updateActiveDataFlows()
     }
 
     fun clearSelection() {

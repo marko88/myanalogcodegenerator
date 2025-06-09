@@ -83,6 +83,7 @@ fun NodeBox(
             ) {
                 node.attributes.forEach { attribute ->
                     NodeAttributeView(
+                        node,
                         attribute,
                         selectionState = architectureRepository.getNodeSelectionState(
                             SelectableEntity.Attribute(node.id, attribute)
@@ -92,6 +93,7 @@ fun NodeBox(
                 }
                 node.methods.forEach { method ->
                     NodeMethodView(
+                        node,
                         method,
                         selectionState = architectureRepository.getNodeSelectionState(
                             SelectableEntity.Method(node.id, method)

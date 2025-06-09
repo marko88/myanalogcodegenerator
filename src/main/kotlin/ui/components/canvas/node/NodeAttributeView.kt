@@ -9,19 +9,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import domain.model.ArchitectureNode
 import domain.model.NodeAttribute
 import myanalogcodegenerator.ui.components.canvas.node.style.NodeItemStyles
 import ui.components.canvas.NodeSelectionState
 
 @Composable
 fun NodeAttributeView(
+    parent: ArchitectureNode,
     attribute: NodeAttribute,
     selectionState: NodeSelectionState = NodeSelectionState.DEFAULT,
     onClick: () -> Unit
 ) {
     val style = NodeItemStyles.fromSelection(selectionState)
 
-    if (selectionState != NodeSelectionState.DEFAULT) {
+    if (selectionState == NodeSelectionState.HIGHLIGHTED) {
         println()
     }
 
@@ -33,7 +35,11 @@ fun NodeAttributeView(
             .clickable { onClick() }
     ) {
         // Left pin (for connecting lines)
-        NodePinView(color = style.textColor, modifier = Modifier.align(Alignment.CenterVertically))
+            NodePinView(
+            pinId = "${parent.id}#${attribute.name}",
+            color = style.textColor,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
 
         if (selectionState == NodeSelectionState.HIGHLIGHTED || selectionState == NodeSelectionState.SELECTED) {
             println()

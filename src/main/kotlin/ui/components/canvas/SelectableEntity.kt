@@ -25,3 +25,13 @@ sealed class SelectableEntity(open val nodeId: String) {
 
     // If needed in future, more types can be added here, like Events, Flows, etc.
 }
+
+/**
+ * This will be used only for Method or Attribute to get a name.
+ */
+val SelectableEntity.name: String?
+    get() = when (this) {
+        is SelectableEntity.Attribute -> this.attribute.name
+        is SelectableEntity.Method -> this.method.name
+        is SelectableEntity.Node -> null
+    }

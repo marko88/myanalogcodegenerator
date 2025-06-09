@@ -5,14 +5,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.onClick
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import myanalogcodegenerator.domain.repository.ArchitectureRepository
+import myanalogcodegenerator.domain.repository.PinPositionRegistry
 import myanalogcodegenerator.ui.components.canvas.LayeredNodeLayout
+import myanalogcodegenerator.ui.components.canvas.node.DataFlowConnectionView
 
 @Composable
 fun CanvasView(architectureRepository: ArchitectureRepository) {
@@ -52,6 +53,18 @@ fun CanvasView(architectureRepository: ArchitectureRepository) {
                 architectureRepository.toggleSelection(selectableEntity)
             }
         )
+    }
+
+    architectureRepository.activeDataFlows.value.forEach { flow ->
+        PinPositionRegistry.getPosition(flow.fromNodeId + "#" + flow.fromSymbol)?.let {
+            PinPositionRegistry.getPosition(flow.toNodeId + "#" + flow.toSymbol)?.let { it1 ->
+                DataFlowConnectionView(
+                    fromCoord = it,
+                    toCoord = it1,
+                    semantics = flow.semantics
+                )
+            }
+        }
     }
 }
 

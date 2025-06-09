@@ -172,13 +172,10 @@ class ArchitectureRepository {
         _selection.value = emptySet()
     }
 
-    // Selection management
-    fun toggleSelection(entity: SelectableEntity) {
-        _selection.value = if (_selection.value.contains(entity)) {
-            _selection.value - entity
-        } else {
-            _selection.value + entity
-        }
+
+    // ✅ New method for full selection state override
+    fun setSelection(newSelection: Set<SelectableEntity>) {
+        _selection.value = newSelection
         updateActiveDataFlows()
     }
 

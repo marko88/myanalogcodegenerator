@@ -10,9 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import myanalogcodegenerator.domain.command.CommandManager
+import myanalogcodegenerator.domain.command.use_cases.SelectEntityCommand
 import myanalogcodegenerator.domain.repository.ArchitectureRepository
 import myanalogcodegenerator.domain.repository.PinPositionRegistry
 import myanalogcodegenerator.ui.components.canvas.LayeredNodeLayout
+import myanalogcodegenerator.ui.components.canvas.SelectableEntity
 import myanalogcodegenerator.ui.components.canvas.node.DataFlowConnectionView
 
 @Composable
@@ -29,7 +32,7 @@ fun CanvasView(architectureRepository: ArchitectureRepository) {
         modifier = Modifier
             .fillMaxSize()
             .clickable {
-                architectureRepository.clearSelection()
+                CommandManager.undo()
             }
             .pointerInput(Unit) {
                 detectTransformGestures { _, pan, zoom, _ ->
@@ -50,7 +53,12 @@ fun CanvasView(architectureRepository: ArchitectureRepository) {
             nodes = nodes,
             selection = selection, // 👈 pass current selection state
             onClick = { selectableEntity ->
-                architectureRepository.toggleSelection(selectableEntity)
+                CommandManager.execute(
+                    SelectEntityCommand(
+                        architectureRepository,
+                        setOf(selectableEntity)
+                    )
+                )
             }
         )
     }

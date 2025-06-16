@@ -31,9 +31,6 @@ fun CanvasView(architectureRepository: ArchitectureRepository) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .clickable {
-                CommandManager.undo()
-            }
             .pointerInput(Unit) {
                 detectTransformGestures { _, pan, zoom, _ ->
                     scale *= zoom

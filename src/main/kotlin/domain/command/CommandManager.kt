@@ -1,5 +1,8 @@
 package myanalogcodegenerator.domain.command
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import myanalogcodegenerator.domain.repository.ArchitectureRepository
 
 object CommandManager {
@@ -13,12 +16,13 @@ object CommandManager {
         context = CommandContext(repository = repository)
     }
 
-    suspend fun execute(command: Command) {
-        command.before(context)
-        command.execute(context)
-        command.after(context)
-        commandStack.add(command)
-        undoStack.clear()
+    fun execute(command: Command) {
+        CoroutineScope(Dispatchers.Main).launch {
+            command.before(context)
+            command.execute(context)
+            command.after(context)
+            commandStack.add(command)
+        }
     }
 
     suspend fun undo() {

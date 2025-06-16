@@ -1,24 +1,38 @@
 package myanalogcodegenerator.domain.command
 
+import myanalogcodegenerator.domain.repository.ArchitectureRepository
+
 object CommandManager {
+
+    private val commandStack = mutableListOf<Command>()
     private val undoStack = mutableListOf<Command>()
-    private val redoStack = mutableListOf<Command>()
 
-    fun execute(command: Command) {
-        command.execute()
-        undoStack.add(command)
-        redoStack.clear()
+    lateinit var context: CommandContext
+
+    fun initialize(repository: ArchitectureRepository) {
+        context = CommandContext(repository = repository)
     }
 
-    fun undo() {
-        val command = undoStack.removeLastOrNull() ?: return
-        command.undo()
-        redoStack.add(command)
+    suspend fun execute(command: Command) {
+        command.before(context)
+        command.execute(context)
+        command.after(context)
+        commandStack.add(command)
+        undoStack.clear()
     }
 
-    fun redo() {
-        val command = redoStack.removeLastOrNull() ?: return
-        command.execute()
-        undoStack.add(command)
+    suspend fun undo() {
+        if (commandStack.isNotEmpty()) {
+            val command = commandStack.removeLast()
+            command.undo(context)
+            undoStack.add(command)
+        }
+    }
+
+    suspend fun redo() {
+        if (undoStack.isNotEmpty()) {
+            val command = undoStack.removeLast()
+            execute(command)
+        }
     }
 }

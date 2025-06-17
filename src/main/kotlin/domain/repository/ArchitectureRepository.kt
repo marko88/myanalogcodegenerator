@@ -25,8 +25,16 @@ class ArchitectureRepository {
         _model.value = _model.value.addNode(node)
     }
 
+    fun removeNode(nodeID: String) {
+        _model.value = _model.value.removeNode(nodeID)
+    }
+
     fun updateModel(newModel: ArchitectureDatabase) {
         _model.value = newModel
+    }
+
+    fun renameNode(id: String, name: String) {
+        _model.value = _model.value.updateNode(id) { it.copy(name = name) }
     }
 
     fun getRelatedNodeIds(nodeId: String): Set<String> {

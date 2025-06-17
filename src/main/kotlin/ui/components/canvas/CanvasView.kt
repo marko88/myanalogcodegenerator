@@ -1,7 +1,6 @@
 package ui.components.canvas
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +14,7 @@ import myanalogcodegenerator.domain.command.use_cases.SelectEntityCommand
 import myanalogcodegenerator.domain.repository.ArchitectureRepository
 import myanalogcodegenerator.domain.repository.PinPositionRegistry
 import myanalogcodegenerator.ui.components.canvas.LayeredNodeLayout
-import myanalogcodegenerator.ui.components.canvas.SelectableEntity
+import myanalogcodegenerator.ui.components.canvas.grid.BlueprintGridBackground
 import myanalogcodegenerator.ui.components.canvas.node.DataFlowConnectionView
 
 @Composable
@@ -28,6 +27,10 @@ fun CanvasView(architectureRepository: ArchitectureRepository) {
     var scale by remember { mutableStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
 
+    BlueprintGridBackground(
+        scale,
+        offset
+    )
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -43,8 +46,8 @@ fun CanvasView(architectureRepository: ArchitectureRepository) {
                 translationX = offset.x,
                 translationY = offset.y
             )
-            .background(color = androidx.compose.ui.graphics.Color(0xFF1A1B26))
     ) {
+
         LayeredNodeLayout(
             architectureRepository,
             nodes = nodes,

@@ -34,6 +34,45 @@ data class ArchitectureDatabase(
         )
     }
 
+    fun removeNode(id: String): ArchitectureDatabase {
+        val node = nodesById[id] ?: return this
+
+        val newNodesById = nodesById - id
+        val newNodesByName = nodesByName - node.name
+        val newNodesByType = nodesByType.mapValues { (_, set) -> set - node }
+        val newNodesByPackage = nodesByPackage.mapValues { (_, set) -> set - node }
+
+        return copy(
+            nodesById = newNodesById,
+            nodesByName = newNodesByName,
+            nodesByType = newNodesByType,
+            nodesByPackage = newNodesByPackage
+        )
+    }
+
+    fun updateNode(id: String, transform: (ArchitectureNode) -> ArchitectureNode): ArchitectureDatabase {
+        val oldNode = nodesById[id] ?: return this
+        val newNode = transform(oldNode)
+
+        val newNodesById = nodesById + (id to newNode)
+        val newNodesByName = nodesByName - oldNode.name + (newNode.name to newNode)
+
+        val updatedTypeSet = nodesByType[oldNode.layer]?.minus(oldNode)?.plus(newNode) ?: setOf(newNode)
+        val newNodesByType = nodesByType + (oldNode.layer to updatedTypeSet)
+
+        val oldPackage = oldNode.layer.packageName
+        val newNodesByPackage = nodesByPackage + (oldPackage to (
+                nodesByPackage[oldPackage]?.minus(oldNode)?.plus(newNode) ?: setOf(newNode)
+                ))
+
+        return copy(
+            nodesById = newNodesById,
+            nodesByName = newNodesByName,
+            nodesByType = newNodesByType,
+            nodesByPackage = newNodesByPackage
+        )
+    }
+
     fun addDataFlow(flow: DataFlowConnection): ArchitectureDatabase {
         return copy(dataFlows = dataFlows + flow)
     }

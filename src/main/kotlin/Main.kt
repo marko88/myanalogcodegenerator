@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import myanalogcodegenerator.domain.command.CommandManager
-import myanalogcodegenerator.domain.model.DemoData
+import myanalogcodegenerator.domain.model.VinylArchitecture
 import myanalogcodegenerator.domain.repository.ArchitectureRepository
 import ui.components.canvas.CanvasView
 
@@ -29,7 +29,7 @@ fun App(architectureRepository: ArchitectureRepository) {
 
 fun main() = application {
     val architectureRepository = ArchitectureRepository().apply {
-        updateModel(DemoData.createDemoArchitecture())
+        updateModel(VinylArchitecture)
     }
 
     CommandManager.initialize(architectureRepository)

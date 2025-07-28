@@ -1,4 +1,4 @@
-package myanalogcodegenerator.dsl
+package myanalogcodegenerator.domain.dsl
 
 import androidx.compose.ui.geometry.Offset
 import domain.model.*
@@ -78,7 +78,13 @@ class LayerScope internal constructor(private val layer: ArchitectureLayer) {
             suspendable: Boolean = false,
             semantics: DataFlowSemantics? = null
         ) = methods.add(
-            NodeMethod(name, returnType, params, suspendable, semantics = semantics)
+            NodeMethod(
+                name,
+                returnType,
+                params.toNodeParams(),           // ✅ conversion
+                isSuspend = suspendable,
+                semantics = semantics
+            )
         )
 
         fun dependsOn(
@@ -98,6 +104,9 @@ class LayerScope internal constructor(private val layer: ArchitectureLayer) {
             methods      = methods,
             dependencies = deps
         )
+
+        internal fun List<Pair<String,String>>.toNodeParams() =
+            map { (n,t) -> NodeParameter(n,t) }
     }
 }
 

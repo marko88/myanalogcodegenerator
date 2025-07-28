@@ -49,11 +49,16 @@ data class NodeDependency(
 data class NodeMethod(
     val name: String,
     val returnType: String,
-    val parameters: List<Pair<String, String>> = emptyList(), // List of (name, type)
+    val parameters: List<NodeParameter> = emptyList(),
     val isSuspend: Boolean = false,
     val isPublic: Boolean = true,
     val description: String = "",
     val semantics: DataFlowSemantics? = null
+)
+
+data class NodeParameter(
+    val name: String,
+    val type: String
 )
 
 /**
@@ -93,6 +98,6 @@ data class DependencyChain(
 )
 
 fun NodeMethod.signature(): String {
-    val params = parameters.joinToString(", ") { "${it.first}: ${it.second}" }
+    val params = parameters.joinToString(", ") { "${it.name}: ${it.type}" }
     return "$name($params): $returnType"
 }

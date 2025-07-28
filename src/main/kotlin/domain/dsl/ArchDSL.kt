@@ -1,4 +1,4 @@
-package myanalogcodegenerator.dsl
+package myanalogcodegenerator.domain.dsl
 
 import domain.repository.ArchitectureDatabase
 

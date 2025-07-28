@@ -12,7 +12,9 @@ import androidx.compose.ui.window.application
 import myanalogcodegenerator.domain.command.CommandManager
 import myanalogcodegenerator.domain.model.VinylArchitecture
 import myanalogcodegenerator.domain.repository.ArchitectureRepository
+import myanalogcodegenerator.generator.ShellGenerator
 import ui.components.canvas.CanvasView
+import java.nio.file.Paths
 
 @Composable
 fun App(architectureRepository: ArchitectureRepository) {
@@ -30,6 +32,10 @@ fun App(architectureRepository: ArchitectureRepository) {
 fun main() = application {
     val architectureRepository = ArchitectureRepository().apply {
         updateModel(VinylArchitecture)
+
+        val out = Paths.get("src/generated/kotlin")
+        println("Generating shells into $out")
+        ShellGenerator.generate(VinylArchitecture, out)
     }
 
     CommandManager.initialize(architectureRepository)

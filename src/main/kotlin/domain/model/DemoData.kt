@@ -2,7 +2,7 @@ package myanalogcodegenerator.domain.model
 
 import domain.model.DataFlowSemantics.*
 import domain.model.DependencyType
-import myanalogcodegenerator.dsl.architecture
+import myanalogcodegenerator.domain.dsl.architecture
 
 /* ─────────────────────────  VINYL APP  ────────────────────────── */
 val VinylArchitecture = architecture("VinylApp") {

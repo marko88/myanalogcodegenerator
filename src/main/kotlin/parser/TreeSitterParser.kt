@@ -1,6 +1,5 @@
 package myanalogcodegenerator.parser
 
-import domain.model.*
 import org.treesitter.*
 
 class TreeSitterParser() {

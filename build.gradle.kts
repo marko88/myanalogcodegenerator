@@ -25,9 +25,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
     implementation("com.squareup:kotlinpoet:1.15.2")
+    implementation("io.github.bonede:tree-sitter:0.24.4")
+    implementation("io.github.bonede:tree-sitter-kotlin:0.3.8.1")
 
 }
-
 compose.desktop {
     application {
         mainClass = "myanalogcodegenerator.MainKt"

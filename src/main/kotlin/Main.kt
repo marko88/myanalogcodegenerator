@@ -14,7 +14,6 @@ import myanalogcodegenerator.domain.model.VinylArchitecture
 import myanalogcodegenerator.domain.repository.ArchitectureRepository
 import myanalogcodegenerator.generator.ShellGenerator
 import myanalogcodegenerator.parser.KotlinTreeSitterRepository
-import myanalogcodegenerator.parser.TreeSitterParser
 import ui.components.canvas.CanvasView
 import java.io.File
 import java.nio.file.Paths
@@ -39,7 +38,7 @@ fun main() = application {
         val out = Paths.get("src/generated/kotlin")
         println("Generating shells into $out")
         ShellGenerator.generate(VinylArchitecture, out)
-        KotlinTreeSitterRepository().parseFile(File("src/generated/kotlin/gen/data/VinylRepositoryGen.kt"), null)
+        KotlinTreeSitterRepository().parseFile(File("src/main/kotlin/test/TestClass.kt"), null)
     }
 
     CommandManager.initialize(architectureRepository)

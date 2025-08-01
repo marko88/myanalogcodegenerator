@@ -1,9 +1,6 @@
 package myanalogcodegenerator.parser
 
-import domain.model.ArchitectureLayer
-import domain.model.ArchitectureNode
-import domain.model.ArchitectureNodeType
-import domain.model.NodeMethod
+import domain.model.*
 import org.treesitter.*
 import java.io.File
 
@@ -16,10 +13,8 @@ class KotlinTreeSitterRepository {
     fun parseFile(file: File, layer: ArchitectureLayer?): ArchitectureNode? {
         val source = file.readText()
         val tree = parser.parseString(null, source)
-
-        val className = findClassName(tree, source)
-        val methodNames = findFunctionNames(tree, source)
-
+        println(tree.rootNode)
+        val className = findMethods(tree, source)
         return null
     }
 
@@ -27,9 +22,11 @@ class KotlinTreeSitterRepository {
      * Find class name
      */
     private fun findClassName(tree: TSTree, source: String): String {
-        val query = TSQuery(TreeSitterKotlin(), """
+        val query = TSQuery(
+            TreeSitterKotlin(), """
         (class_declaration (type_identifier) @class_name)
-    """.trimIndent())
+    """.trimIndent()
+        )
 
         val cursor = TSQueryCursor()
         cursor.exec(query, tree.rootNode)
@@ -42,23 +39,57 @@ class KotlinTreeSitterRepository {
         return "UnnamedClass"
     }
 
-    /**
-     * Find function names.
-     */
-    private fun findFunctionNames(tree: TSTree, source: String): List<String> {
+    private fun findMethods(tree: TSTree, source: String): List<NodeMethod> {
         val query = TSQuery(
             TreeSitterKotlin(), """
-            (function_declaration (simple_identifier) @func_name)
-        """.trimIndent()
+            (function_declaration
+                (simple_identifier) @func_name
+                (function_value_parameters) @params
+                (user_type) @return_type)
+            """.trimIndent()
         )
+
         val cursor = TSQueryCursor()
         cursor.exec(query, tree.rootNode)
 
-        return cursor.matches.asSequence().flatMap { match ->
-            match.captures.map { cap ->
-                extractTextByByteRange(source, cap.node.startByte, cap.node.endByte)
+        val methods = mutableListOf<NodeMethod>()
+
+        for (match in cursor.matches) {
+            var funcName = ""
+            var returnType = "Unit"
+            var rawParams = ""
+
+            for (cap in match.captures) {
+                val capture = query.getCaptureNameForId(cap.index)
+                val text = extractTextByByteRange(source, cap.node.startByte, cap.node.endByte)
+
+                when (capture) {
+                    "func_name" -> funcName = text
+                    "return_type" -> returnType = text
+                    "params" -> rawParams = text // will be like "(id: Int, name: String)"
+                }
             }
-        }.toList()
+
+            val paramList = rawParams
+                .removePrefix("(").removeSuffix(")")
+                .split(',')
+                .mapNotNull { part ->
+                    val pieces = part.trim().split(":")
+                    if (pieces.size == 2) {
+                        val name = pieces[0].trim()
+                        val type = pieces[1].trim()
+                        NodeParameter(name, type)
+                    } else null
+                }
+
+            methods += NodeMethod(
+                name = funcName,
+                returnType = returnType,
+                parameters = paramList
+            )
+        }
+
+        return methods
     }
 
     private fun extractTextByByteRange(source: String, startByte: Int, endByte: Int): String {

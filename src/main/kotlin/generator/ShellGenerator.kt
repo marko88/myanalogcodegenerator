@@ -14,7 +14,8 @@ object ShellGenerator {
                 ArchitectureNodeType.REPOSITORY,
                 ArchitectureNodeType.API,
                 ArchitectureNodeType.VIEWMODEL -> buildInterface(node, pkg)
-                else                           -> buildAbstract(node, pkg)
+
+                else -> buildAbstract(node, pkg)
             }
             file.writeTo(outDir)
         }
@@ -23,6 +24,19 @@ object ShellGenerator {
     /* interfaces --------------------------------------------------- */
     private fun buildInterface(node: ArchitectureNode, pkg: String): FileSpec {
         val type = TypeSpec.interfaceBuilder("${node.name}Gen").apply {
+            // Add abstract dependency references
+            node.dependencies.forEach { dep ->
+                val className = ClassName(pkg.substringBeforeLast("."), "${dep.targetId}Gen")
+                val propName = dep.targetId.replaceFirstChar { it.lowercaseChar() }
+
+                addProperty(
+                    PropertySpec.builder(propName, className)
+                        .addModifiers(KModifier.ABSTRACT)
+                        .build()
+                )
+            }
+
+            // Add other methods and attributes
             node.methods.forEach { addFunction(it.toFunSpec(abstract = false)) }
             node.attributes.forEach { addProperty(it.toPropertySpec()) }
         }.build()
@@ -38,8 +52,27 @@ object ShellGenerator {
         val cls = TypeSpec.classBuilder("${node.name}Gen")
             .addModifiers(KModifier.ABSTRACT)
             .apply {
+                // Generate dependencies as constructor parameters and properties
+                node.dependencies.forEach { dep ->
+                    val className = ClassName(pkg.substringBeforeLast("."), "${dep.targetId}Gen")
+                    val paramName = dep.targetId.replaceFirstChar { it.lowercaseChar() }
+
+                    primaryConstructor(
+                        FunSpec.constructorBuilder()
+                            .addParameter(paramName, className)
+                            .build()
+                    )
+
+                    addProperty(
+                        PropertySpec.builder(paramName, className)
+                            .initializer(paramName)
+                            .addModifiers(KModifier.PROTECTED)
+                            .build()
+                    )
+                }
+
                 node.attributes.forEach { addProperty(it.toPropertySpec()) }
-                node.methods.forEach  { addFunction(it.toFunSpec(abstract = true)) }
+                node.methods.forEach { addFunction(it.toFunSpec(abstract = true)) }
             }
             .build()
 

@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.sp
 import domain.model.ArchitectureNode
 import domain.model.NodeAttribute
 import myanalogcodegenerator.ui.components.canvas.node.style.NodeItemStyles
-import ui.components.canvas.NodeSelectionState
+import myanalogcodegenerator.ui.components.canvas.graph.NodeSelectionState
 
 @Composable
 fun NodeAttributeView(

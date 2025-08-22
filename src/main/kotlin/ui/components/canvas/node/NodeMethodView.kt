@@ -10,7 +10,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -19,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import domain.model.ArchitectureNode
 import domain.model.NodeMethod
 import myanalogcodegenerator.ui.components.canvas.node.style.NodeItemStyles
-import ui.components.canvas.NodeSelectionState
+import myanalogcodegenerator.ui.components.canvas.graph.NodeSelectionState
 
 @Preview
 @Composable

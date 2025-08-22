@@ -1,4 +1,4 @@
-package myanalogcodegenerator.ui.components.canvas
+package myanalogcodegenerator.ui.components.canvas.graph
 
 import domain.model.NodeAttribute
 import domain.model.NodeMethod

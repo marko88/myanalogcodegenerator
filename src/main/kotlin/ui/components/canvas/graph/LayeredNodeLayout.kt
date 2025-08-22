@@ -1,4 +1,4 @@
-package myanalogcodegenerator.ui.components.canvas
+package myanalogcodegenerator.ui.components.canvas.graph
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState

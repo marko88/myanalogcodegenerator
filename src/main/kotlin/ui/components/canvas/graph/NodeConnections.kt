@@ -1,3 +1,5 @@
+package myanalogcodegenerator.ui.components.canvas.graph
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

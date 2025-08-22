@@ -7,9 +7,9 @@ import domain.model.NodeDependency
 import domain.repository.ArchitectureDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import myanalogcodegenerator.ui.components.canvas.SelectableEntity
-import myanalogcodegenerator.ui.components.canvas.name
-import ui.components.canvas.NodeSelectionState
+import myanalogcodegenerator.ui.components.canvas.graph.SelectableEntity
+import myanalogcodegenerator.ui.components.canvas.graph.name
+import myanalogcodegenerator.ui.components.canvas.graph.NodeSelectionState
 
 class ArchitectureRepository {
     private val _model = MutableStateFlow(ArchitectureDatabase())

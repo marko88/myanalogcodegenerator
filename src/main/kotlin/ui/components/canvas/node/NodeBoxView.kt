@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import domain.model.ArchitectureNode
 import myanalogcodegenerator.domain.repository.ArchitectureRepository
-import myanalogcodegenerator.ui.components.canvas.SelectableEntity
-import ui.components.canvas.NodeSelectionState
+import myanalogcodegenerator.ui.components.canvas.graph.SelectableEntity
+import myanalogcodegenerator.ui.components.canvas.graph.NodeSelectionState
 import myanalogcodegenerator.ui.components.canvas.node.style.NodeBoxStyles
 
 @Composable

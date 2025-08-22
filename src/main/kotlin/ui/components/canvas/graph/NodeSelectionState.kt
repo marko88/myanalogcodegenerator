@@ -1,4 +1,4 @@
-package ui.components.canvas
+package myanalogcodegenerator.ui.components.canvas.graph
 
 import androidx.compose.ui.graphics.Color
 

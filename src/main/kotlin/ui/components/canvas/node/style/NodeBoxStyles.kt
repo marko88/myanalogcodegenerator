@@ -2,7 +2,7 @@ package myanalogcodegenerator.ui.components.canvas.node.style
 
 import androidx.compose.ui.graphics.Color
 import domain.model.ArchitectureLayer
-import ui.components.canvas.NodeSelectionState
+import myanalogcodegenerator.ui.components.canvas.graph.NodeSelectionState
 
 object NodeBoxStyles {
 

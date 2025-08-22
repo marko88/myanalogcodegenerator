@@ -2,7 +2,7 @@ package myanalogcodegenerator.domain.command.use_cases
 
 import myanalogcodegenerator.domain.command.CommandContext
 import myanalogcodegenerator.domain.repository.ArchitectureRepository
-import myanalogcodegenerator.ui.components.canvas.SelectableEntity
+import myanalogcodegenerator.ui.components.canvas.graph.SelectableEntity
 
 class SelectEntityCommand(
     private val repository: ArchitectureRepository,
